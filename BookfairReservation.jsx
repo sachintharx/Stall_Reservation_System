@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { MapPin, User, CheckCircle, LayoutDashboard, X, Building, Mail, Lock, Plus, LogOut, Home, TrendingUp, Calendar, Clock, Users, Star, Award, Target, Eye } from 'lucide-react';
+import { MapPin, User, CheckCircle, LayoutDashboard, X, Building, Mail, Lock, Plus, LogOut, Home, TrendingUp, Calendar, Clock, Users, Star, Award, Target, Eye, Trash2 } from 'lucide-react';
 
 // Generate initial stall data
 const generateInitialStalls = () => {
@@ -87,6 +87,22 @@ const App = () => {
       setGenres([...genres, genreInput.trim()]);
       setGenreInput('');
     }
+  };
+
+  const cancelReservation = (stallId) => {
+    const updatedStalls = stalls.map(stall => {
+      if (stall.id === stallId && stall.businessName === vendorInfo.businessName) {
+        return {
+          ...stall,
+          reserved: false,
+          businessName: null,
+          email: null
+        };
+      }
+      return stall;
+    });
+    
+    setStalls(updatedStalls);
   };
 
   const stats = {
@@ -707,13 +723,38 @@ const App = () => {
           
           <div className="bg-gradient-to-br from-pink-500/20 to-purple-600/20 border border-pink-500/30 p-6 rounded-2xl mb-8">
             <h3 className="font-semibold text-white mb-3">Your Reserved Stalls:</h3>
-            <div className="flex flex-wrap gap-2">
+            <div className="space-y-2">
               {stalls.filter(s => s.businessName === vendorInfo.businessName).map(stall => (
-                <span key={stall.id} className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-4 py-2 rounded-xl font-semibold shadow-lg shadow-pink-500/30">
-                  {stall.id}
-                </span>
+                <div key={stall.id} className="flex items-center justify-between bg-gradient-to-r from-pink-500/10 to-purple-600/10 border border-pink-500/20 p-3 rounded-xl group hover:from-pink-500/20 hover:to-purple-600/20 transition-all">
+                  <span className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-4 py-2 rounded-lg font-semibold shadow-lg shadow-pink-500/30">
+                    {stall.id}
+                  </span>
+                  <button
+                    onClick={() => {
+                      if (window.confirm(`Are you sure you want to cancel the reservation for stall ${stall.id}?`)) {
+                        cancelReservation(stall.id);
+                      }
+                    }}
+                    className="bg-gradient-to-r from-red-500 to-red-600 text-white px-4 py-2 rounded-lg font-semibold hover:from-red-600 hover:to-red-700 transition transform hover:scale-105 flex items-center gap-2 shadow-lg shadow-red-500/30"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    Cancel Booking
+                  </button>
+                </div>
               ))}
             </div>
+            {stalls.filter(s => s.businessName === vendorInfo.businessName).length === 0 && (
+              <div className="text-center py-8">
+                <p className="text-gray-400 mb-4">You don't have any active reservations</p>
+                <button
+                  onClick={() => setCurrentView('vendor_map')}
+                  className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-6 py-3 rounded-xl font-semibold hover:from-pink-600 hover:to-purple-700 transition transform hover:scale-105 flex items-center gap-2 shadow-lg shadow-pink-500/30 mx-auto"
+                >
+                  <Plus className="w-5 h-5" />
+                  Reserve New Stalls
+                </button>
+              </div>
+            )}
           </div>
           
           <div className="border-t border-white/10 pt-6">
