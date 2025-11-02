@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { MapPin, User, CheckCircle, LayoutDashboard, X, Building, Mail, Lock, Plus, LogOut, Home, TrendingUp, Calendar, Clock, Users, Star, Award, Target, Eye, Trash2 } from 'lucide-react';
+import { MapPin, User, CheckCircle, LayoutDashboard, X, Building, Mail, Lock, Plus, LogOut, Home, TrendingUp, Calendar, Clock, Users, Star, Award, Target, Eye, Trash2, BookOpen, Book, Library, Bookmark, BookMarked, GraduationCap, Feather, Sparkles } from 'lucide-react';
 
 // Generate initial stall data
 const generateInitialStalls = () => {
@@ -206,18 +206,69 @@ const App = () => {
 
   // Landing Page
   const LandingPage = () => (
-    <div className={`min-h-screen bg-gradient-to-br from-[#1a1f37] via-[#2d1b4e] to-[#1a1f37] flex items-center justify-center p-8 transition-opacity duration-500 ${fadeIn ? 'opacity-100' : 'opacity-0'}`}>
-      <div className="max-w-6xl w-full">
+    <div className={`min-h-screen bg-gradient-to-br from-[#1a1f37] via-[#2d1b4e] to-[#1a1f37] flex items-center justify-center p-8 transition-opacity duration-500 ${fadeIn ? 'opacity-100' : 'opacity-0'} relative overflow-hidden`}>
+      {/* Animated Background Orbs */}
+      <div className="background-orbs">
+        <div className="orb orb-1"></div>
+        <div className="orb orb-2"></div>
+        <div className="orb orb-3"></div>
+        <div className="orb orb-4"></div>
+      </div>
+      
+      {/* Floating Particles */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {[...Array(20)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-2 h-2 bg-white/10 rounded-full animate-float"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 5}s`,
+              animationDuration: `${5 + Math.random() * 10}s`
+            }}
+          ></div>
+        ))}
+      </div>
+      
+      {/* Floating Book Icons */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {[...Array(8)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute text-white/5 animate-floating-book"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 4}s`,
+              animationDuration: `${6 + Math.random() * 6}s`
+            }}
+          >
+            {i % 3 === 0 ? <BookOpen size={40 + Math.random() * 40} /> : 
+             i % 3 === 1 ? <Book size={40 + Math.random() * 40} /> : 
+             <Library size={40 + Math.random() * 40} />}
+          </div>
+        ))}
+      </div>
+      
+      <div className="max-w-6xl w-full relative z-10">
         {/* Header Section with Stats */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-pink-500/20 to-purple-600/20 border border-pink-500/30 px-4 py-2 rounded-full mb-6">
-            <Star className="w-4 h-4 text-pink-400" />
+          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-pink-500/20 to-purple-600/20 border border-pink-500/30 px-4 py-2 rounded-full mb-6 animate-book-open">
+            <BookOpen className="w-4 h-4 text-pink-400 animate-page-flip" />
             <span className="text-pink-300 text-sm font-semibold">Colombo 2025 - Premium Event</span>
+            <Sparkles className="w-4 h-4 text-pink-400 animate-sparkle" />
           </div>
-          <h1 className="text-6xl font-bold text-white mb-4 drop-shadow-lg bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400 bg-clip-text text-transparent">
+          <h1 className="text-6xl font-bold text-white mb-4 drop-shadow-lg bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400 bg-clip-text text-transparent flex items-center justify-center gap-4">
+            <Book className="w-16 h-16 text-pink-400 animate-floating-book" />
             Colombo International Bookfair
+            <Library className="w-16 h-16 text-purple-400 animate-floating-book" style={{ animationDelay: '2s' }} />
           </h1>
-          <p className="text-xl text-gray-300 mb-8">Smart Stall Reservation System</p>
+          <p className="text-xl text-gray-300 mb-8 flex items-center justify-center gap-2">
+            <Feather className="w-5 h-5 text-purple-400" />
+            Smart Stall Reservation System
+            <Feather className="w-5 h-5 text-pink-400" />
+          </p>
           
           {/* Quick Stats Bar */}
           <div className="grid grid-cols-3 gap-4 max-w-3xl mx-auto mb-12">
@@ -260,11 +311,16 @@ const App = () => {
             {/* Animated background gradient */}
             <div className="absolute inset-0 bg-gradient-to-br from-pink-500/5 to-purple-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             
+            {/* Book Page Effect */}
+            <div className="absolute top-0 right-0 opacity-10 group-hover:opacity-20 transition-opacity">
+              <BookMarked className="w-32 h-32 text-pink-400 animate-page-flip" />
+            </div>
+            
             <div className="relative flex flex-col items-center space-y-6">
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-br from-pink-500 to-purple-600 rounded-full blur-xl opacity-50 group-hover:opacity-75 transition-opacity"></div>
                 <div className="relative bg-gradient-to-br from-pink-500 to-purple-600 p-6 rounded-full group-hover:scale-110 transition-transform shadow-lg shadow-pink-500/50">
-                  <Building className="w-12 h-12 text-white" />
+                  <BookOpen className="w-12 h-12 text-white" />
                 </div>
               </div>
               
@@ -275,13 +331,16 @@ const App = () => {
               
               {/* Feature Pills */}
               <div className="flex flex-wrap gap-2 justify-center">
-                <span className="bg-pink-500/20 border border-pink-500/30 text-pink-300 px-3 py-1 rounded-full text-xs font-semibold">
+                <span className="bg-pink-500/20 border border-pink-500/30 text-pink-300 px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
+                  <Book className="w-3 h-3" />
                   Interactive Map
                 </span>
-                <span className="bg-purple-500/20 border border-purple-500/30 text-purple-300 px-3 py-1 rounded-full text-xs font-semibold">
+                <span className="bg-purple-500/20 border border-purple-500/30 text-purple-300 px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
+                  <Bookmark className="w-3 h-3" />
                   Instant Booking
                 </span>
-                <span className="bg-blue-500/20 border border-blue-500/30 text-blue-300 px-3 py-1 rounded-full text-xs font-semibold">
+                <span className="bg-blue-500/20 border border-blue-500/30 text-blue-300 px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
+                  <Sparkles className="w-3 h-3" />
                   Real-time Updates
                 </span>
               </div>
@@ -303,11 +362,16 @@ const App = () => {
             {/* Animated background gradient */}
             <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-cyan-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             
+            {/* Book Stack Effect */}
+            <div className="absolute bottom-0 left-0 opacity-10 group-hover:opacity-20 transition-opacity">
+              <Library className="w-32 h-32 text-blue-400 animate-floating-book" />
+            </div>
+            
             <div className="relative flex flex-col items-center space-y-6">
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-full blur-xl opacity-50 group-hover:opacity-75 transition-opacity"></div>
                 <div className="relative bg-gradient-to-br from-blue-500 to-cyan-600 p-6 rounded-full group-hover:scale-110 transition-transform shadow-lg shadow-blue-500/50">
-                  <LayoutDashboard className="w-12 h-12 text-white" />
+                  <GraduationCap className="w-12 h-12 text-white" />
                 </div>
               </div>
               
@@ -318,13 +382,16 @@ const App = () => {
               
               {/* Feature Pills */}
               <div className="flex flex-wrap gap-2 justify-center">
-                <span className="bg-blue-500/20 border border-blue-500/30 text-blue-300 px-3 py-1 rounded-full text-xs font-semibold">
+                <span className="bg-blue-500/20 border border-blue-500/30 text-blue-300 px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
+                  <LayoutDashboard className="w-3 h-3" />
                   Analytics
                 </span>
-                <span className="bg-cyan-500/20 border border-cyan-500/30 text-cyan-300 px-3 py-1 rounded-full text-xs font-semibold">
+                <span className="bg-cyan-500/20 border border-cyan-500/30 text-cyan-300 px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
+                  <BookMarked className="w-3 h-3" />
                   Reports
                 </span>
-                <span className="bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 px-3 py-1 rounded-full text-xs font-semibold">
+                <span className="bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
+                  <Library className="w-3 h-3" />
                   Management
                 </span>
               </div>
@@ -342,23 +409,38 @@ const App = () => {
         {/* Bottom Info Banner */}
         <div className="mt-12 bg-gradient-to-r from-[#2a2f4a]/60 to-[#1e2337]/60 backdrop-blur-xl border border-white/10 rounded-2xl p-6 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Award className="w-8 h-8 text-yellow-400" />
+            <div className="relative">
+              <Book className="w-8 h-8 text-yellow-400 animate-floating-book" />
+              <Sparkles className="w-4 h-4 text-yellow-400 absolute -top-1 -right-1 animate-sparkle" />
+            </div>
             <div>
-              <div className="text-white font-bold">Trusted by 200+ Publishers</div>
-              <div className="text-sm text-gray-400">Sri Lanka's Premier Book Exhibition Platform</div>
+              <div className="text-white font-bold flex items-center gap-2">
+                <BookOpen className="w-4 h-4 text-pink-400" />
+                Trusted by 200+ Publishers
+              </div>
+              <div className="text-sm text-gray-400 flex items-center gap-2">
+                <Feather className="w-3 h-3 text-purple-400" />
+                Sri Lanka's Premier Book Exhibition Platform
+              </div>
             </div>
           </div>
           <div className="hidden md:flex items-center gap-6">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-white">50+</div>
+            <div className="text-center group">
+              <div className="text-2xl font-bold text-white flex items-center justify-center gap-1">
+                50+
+                <BookMarked className="w-5 h-5 text-pink-400 group-hover:animate-bookmark-drop" />
+              </div>
               <div className="text-xs text-gray-400">Stalls</div>
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-white">6</div>
               <div className="text-xs text-gray-400">Days</div>
             </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-white">24/7</div>
+            <div className="text-center group">
+              <div className="text-2xl font-bold text-white flex items-center justify-center gap-1">
+                24/7
+                <Library className="w-5 h-5 text-blue-400 group-hover:animate-floating-book" />
+              </div>
               <div className="text-xs text-gray-400">Support</div>
             </div>
           </div>
@@ -369,22 +451,57 @@ const App = () => {
 
   // Vendor Registration
   const VendorRegister = () => (
-    <div className={`min-h-screen bg-gradient-to-br from-[#1a1f37] via-[#2d1b4e] to-[#1a1f37] flex items-center justify-center p-8 transition-opacity duration-500 ${fadeIn ? 'opacity-100' : 'opacity-0'}`}>
-      <div className="max-w-md w-full">
+    <div className={`min-h-screen bg-gradient-to-br from-[#1a1f37] via-[#2d1b4e] to-[#1a1f37] flex items-center justify-center p-8 transition-opacity duration-500 ${fadeIn ? 'opacity-100' : 'opacity-0'} relative overflow-hidden`}>
+      {/* Animated Background */}
+      <div className="background-orbs">
+        <div className="orb orb-1"></div>
+        <div className="orb orb-2"></div>
+        <div className="orb orb-3"></div>
+      </div>
+      
+      {/* Grid Pattern Overlay */}
+      <div className="absolute inset-0 opacity-10" style={{
+        backgroundImage: `linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px)`,
+        backgroundSize: '50px 50px'
+      }}></div>
+      
+      {/* Floating Book Pages */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {[...Array(6)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute text-pink-400/10 animate-page-flip"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 3}s`,
+              animationDuration: `${4 + Math.random() * 4}s`
+            }}
+          >
+            <BookOpen size={30 + Math.random() * 30} />
+          </div>
+        ))}
+      </div>
+      
+      <div className="max-w-md w-full relative z-10">
         <button
           onClick={() => setCurrentView('landing')}
-          className="mb-4 text-pink-400 hover:text-pink-300 flex items-center gap-2 transition-colors"
+          className="mb-4 text-pink-400 hover:text-pink-300 flex items-center gap-2 transition-colors group"
         >
-          <Home className="w-4 h-4" /> Back to Home
+          <Home className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> Back to Home
         </button>
         
-        <div className="bg-gradient-to-br from-[#2a2f4a]/80 to-[#1e2337]/80 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl p-8">
+        <div className="bg-gradient-to-br from-[#2a2f4a]/80 to-[#1e2337]/80 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl p-8 animate-book-open">
           <div className="text-center mb-8">
-            <div className="bg-gradient-to-br from-pink-500 to-purple-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-pink-500/50">
-              <User className="w-8 h-8 text-white" />
+            <div className="bg-gradient-to-br from-pink-500 to-purple-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-pink-500/50 relative">
+              <BookOpen className="w-8 h-8 text-white animate-page-flip" />
+              <Sparkles className="w-4 h-4 text-yellow-300 absolute -top-1 -right-1 animate-sparkle" />
             </div>
             <h2 className="text-3xl font-bold text-white">Vendor Registration</h2>
-            <p className="text-gray-300 mt-2">Create your account to reserve stalls</p>
+            <p className="text-gray-300 mt-2 flex items-center justify-center gap-2">
+              <Feather className="w-4 h-4 text-purple-400" />
+              Create your account to reserve stalls
+            </p>
           </div>
           
           <form onSubmit={(e) => { e.preventDefault(); setCurrentView('vendor_map'); }} className="space-y-6">
@@ -447,8 +564,21 @@ const App = () => {
 
   // Stall Map View
   const VendorMapView = () => (
-    <div className={`min-h-screen bg-gradient-to-br from-[#1a1f37] via-[#2d1b4e] to-[#1a1f37] p-8 transition-opacity duration-500 ${fadeIn ? 'opacity-100' : 'opacity-0'}`}>
-      <div className="max-w-7xl mx-auto">
+    <div className={`min-h-screen bg-gradient-to-br from-[#1a1f37] via-[#2d1b4e] to-[#1a1f37] p-8 transition-opacity duration-500 ${fadeIn ? 'opacity-100' : 'opacity-0'} relative overflow-hidden`}>
+      {/* Animated Background */}
+      <div className="background-orbs">
+        <div className="orb orb-1"></div>
+        <div className="orb orb-2"></div>
+        <div className="orb orb-4"></div>
+      </div>
+      
+      {/* Animated Gradient Overlay */}
+      <div className="absolute inset-0 opacity-20 pointer-events-none">
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-pink-500/30 rounded-full blur-3xl animate-pulse-slow"></div>
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/30 rounded-full blur-3xl animate-pulse-slow" style={{ animationDelay: '2s' }}></div>
+      </div>
+      
+      <div className="max-w-7xl mx-auto relative z-10">
         <button
           onClick={() => { setCurrentView('vendor_register'); setSelectedStalls([]); }}
           className="mb-4 text-pink-400 hover:text-pink-300 flex items-center gap-2 transition-colors group"
@@ -461,12 +591,19 @@ const App = () => {
           <div className="lg:col-span-3 bg-gradient-to-br from-[#2a2f4a]/80 to-[#1e2337]/80 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl p-8">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
-                <div className="bg-gradient-to-br from-pink-500 to-purple-600 p-3 rounded-xl shadow-lg shadow-pink-500/50">
-                  <MapPin className="w-6 h-6 text-white" />
+                <div className="bg-gradient-to-br from-pink-500 to-purple-600 p-3 rounded-xl shadow-lg shadow-pink-500/50 relative">
+                  <Book className="w-6 h-6 text-white animate-page-flip" />
+                  <Bookmark className="w-3 h-3 text-yellow-300 absolute -top-1 -right-1 animate-bookmark-drop" />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold text-white">Reserve Your Stalls</h2>
-                  <p className="text-sm text-gray-400">Select up to 3 exhibition spaces</p>
+                  <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+                    Reserve Your Stalls
+                    <Sparkles className="w-5 h-5 text-pink-400 animate-sparkle" />
+                  </h2>
+                  <p className="text-sm text-gray-400 flex items-center gap-1">
+                    <Feather className="w-3 h-3 text-purple-400" />
+                    Select up to 3 exhibition spaces
+                  </p>
                 </div>
               </div>
               <div className="bg-gradient-to-br from-pink-500/20 to-purple-600/20 px-4 py-2 rounded-xl border border-pink-500/30">
@@ -477,11 +614,15 @@ const App = () => {
             {/* Vendor Info Badge */}
             <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20 rounded-2xl p-4 mb-6 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="bg-gradient-to-br from-blue-500 to-purple-600 p-2 rounded-lg">
-                  <User className="w-5 h-5 text-white" />
+                <div className="bg-gradient-to-br from-blue-500 to-purple-600 p-2 rounded-lg relative">
+                  <BookOpen className="w-5 h-5 text-white" />
+                  <Sparkles className="w-3 h-3 text-yellow-300 absolute -top-1 -right-1 animate-sparkle" />
                 </div>
                 <div>
-                  <div className="text-xs text-gray-400">Booking for</div>
+                  <div className="text-xs text-gray-400 flex items-center gap-1">
+                    <Feather className="w-3 h-3" />
+                    Booking for
+                  </div>
                   <div className="text-white font-semibold">{vendorInfo.businessName}</div>
                 </div>
               </div>
@@ -703,8 +844,31 @@ const App = () => {
 
   // Vendor Home (Post-Confirmation)
   const VendorHome = () => (
-    <div className={`min-h-screen bg-gradient-to-br from-[#1a1f37] via-[#2d1b4e] to-[#1a1f37] flex items-center justify-center p-8 transition-opacity duration-500 ${fadeIn ? 'opacity-100' : 'opacity-0'}`}>
-      <div className="max-w-2xl w-full">
+    <div className={`min-h-screen bg-gradient-to-br from-[#1a1f37] via-[#2d1b4e] to-[#1a1f37] flex items-center justify-center p-8 transition-opacity duration-500 ${fadeIn ? 'opacity-100' : 'opacity-0'} relative overflow-hidden`}>
+      {/* Animated Success Background */}
+      <div className="background-orbs">
+        <div className="orb orb-4"></div>
+        <div className="orb orb-3"></div>
+      </div>
+      
+      {/* Sparkle Effects */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {[...Array(15)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-1 h-1 bg-green-400/60 rounded-full animate-float"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 3}s`,
+              animationDuration: `${3 + Math.random() * 5}s`,
+              boxShadow: '0 0 10px rgba(74, 222, 128, 0.8)'
+            }}
+          ></div>
+        ))}
+      </div>
+      
+      <div className="max-w-2xl w-full relative z-10">
         <button
           onClick={() => setCurrentView('landing')}
           className="mb-4 text-green-400 hover:text-green-300 flex items-center gap-2 transition-colors"
@@ -712,21 +876,32 @@ const App = () => {
           <Home className="w-4 h-4" /> Back to Home
         </button>
         
-        <div className="bg-gradient-to-br from-[#2a2f4a]/80 to-[#1e2337]/80 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl p-8">
+        <div className="bg-gradient-to-br from-[#2a2f4a]/80 to-[#1e2337]/80 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl p-8 animate-book-open">
           <div className="text-center mb-8">
-            <div className="bg-gradient-to-br from-green-400 to-emerald-500 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-green-500/50">
-              <CheckCircle className="w-12 h-12 text-white" />
+            <div className="bg-gradient-to-br from-green-400 to-emerald-500 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-green-500/50 relative">
+              <BookMarked className="w-12 h-12 text-white animate-bookmark-drop" />
+              <Sparkles className="w-6 h-6 text-yellow-300 absolute -top-2 -right-2 animate-sparkle" />
             </div>
-            <h2 className="text-3xl font-bold text-white mb-2">Reservation Confirmed!</h2>
-            <p className="text-gray-300">Your stalls have been successfully reserved</p>
+            <h2 className="text-3xl font-bold text-white mb-2 flex items-center justify-center gap-2">
+              <Book className="w-8 h-8 text-green-400 animate-floating-book" />
+              Reservation Confirmed!
+            </h2>
+            <p className="text-gray-300 flex items-center justify-center gap-2">
+              <Feather className="w-4 h-4 text-emerald-400" />
+              Your stalls have been successfully reserved
+            </p>
           </div>
           
           <div className="bg-gradient-to-br from-pink-500/20 to-purple-600/20 border border-pink-500/30 p-6 rounded-2xl mb-8">
-            <h3 className="font-semibold text-white mb-3">Your Reserved Stalls:</h3>
+            <h3 className="font-semibold text-white mb-3 flex items-center gap-2">
+              <Library className="w-5 h-5 text-pink-400 animate-floating-book" />
+              Your Reserved Stalls:
+            </h3>
             <div className="space-y-2">
               {stalls.filter(s => s.businessName === vendorInfo.businessName).map(stall => (
                 <div key={stall.id} className="flex items-center justify-between bg-gradient-to-r from-pink-500/10 to-purple-600/10 border border-pink-500/20 p-3 rounded-xl group hover:from-pink-500/20 hover:to-purple-600/20 transition-all">
-                  <span className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-4 py-2 rounded-lg font-semibold shadow-lg shadow-pink-500/30">
+                  <span className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-4 py-2 rounded-lg font-semibold shadow-lg shadow-pink-500/30 flex items-center gap-2">
+                    <BookOpen className="w-4 h-4" />
                     {stall.id}
                   </span>
                   <button
@@ -745,6 +920,7 @@ const App = () => {
             </div>
             {stalls.filter(s => s.businessName === vendorInfo.businessName).length === 0 && (
               <div className="text-center py-8">
+                <BookOpen className="w-16 h-16 text-gray-400 mx-auto mb-4 animate-page-flip" />
                 <p className="text-gray-400 mb-4">You don't have any active reservations</p>
                 <button
                   onClick={() => setCurrentView('vendor_map')}
@@ -758,7 +934,10 @@ const App = () => {
           </div>
           
           <div className="border-t border-white/10 pt-6">
-            <h3 className="text-xl font-bold text-white mb-4">Add Literary Genres You Will Display</h3>
+            <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+              <Book className="w-6 h-6 text-green-400 animate-page-flip" />
+              Add Literary Genres You Will Display
+            </h3>
             <div className="flex gap-2 mb-4">
               <input
                 type="text"
@@ -772,17 +951,21 @@ const App = () => {
                 onClick={addGenre}
                 className="bg-gradient-to-r from-green-400 to-emerald-500 text-white px-6 py-3 rounded-xl font-semibold hover:from-green-500 hover:to-emerald-600 transition transform hover:scale-105 flex items-center gap-2 shadow-lg shadow-green-500/30"
               >
-                <Plus className="w-5 h-5" />
+                <BookMarked className="w-5 h-5" />
                 Add
               </button>
             </div>
             
             {genres.length > 0 && (
               <div className="space-y-2">
-                <p className="text-sm font-medium text-gray-300">Your Genres:</p>
+                <p className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                  <Library className="w-4 h-4 text-green-400" />
+                  Your Genres:
+                </p>
                 <div className="flex flex-wrap gap-2">
                   {genres.map((genre, idx) => (
-                    <span key={idx} className="bg-gradient-to-r from-green-400/20 to-emerald-500/20 border border-green-400/30 text-green-300 px-3 py-1 rounded-full text-sm font-medium">
+                    <span key={idx} className="bg-gradient-to-r from-green-400/20 to-emerald-500/20 border border-green-400/30 text-green-300 px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1">
+                      <Bookmark className="w-3 h-3" />
                       {genre}
                     </span>
                   ))}
@@ -797,8 +980,40 @@ const App = () => {
 
   // Admin Login
   const AdminLogin = () => (
-    <div className={`min-h-screen bg-gradient-to-br from-[#1a1f37] via-[#2d1b4e] to-[#1a1f37] flex items-center justify-center p-8 transition-opacity duration-500 ${fadeIn ? 'opacity-100' : 'opacity-0'}`}>
-      <div className="max-w-md w-full">
+    <div className={`min-h-screen bg-gradient-to-br from-[#1a1f37] via-[#2d1b4e] to-[#1a1f37] flex items-center justify-center p-8 transition-opacity duration-500 ${fadeIn ? 'opacity-100' : 'opacity-0'} relative overflow-hidden`}>
+      {/* Animated Background */}
+      <div className="background-orbs">
+        <div className="orb orb-2"></div>
+        <div className="orb orb-3"></div>
+      </div>
+      
+      {/* Hexagon Pattern Overlay */}
+      <div className="absolute inset-0 opacity-5 pointer-events-none">
+        <div className="absolute inset-0" style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='50' height='50' viewBox='0 0 50 50' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M25 0l12.5 7.2v14.4L25 28.9 12.5 21.6V7.2L25 0z' fill='none' stroke='rgba(255,255,255,0.3)' stroke-width='0.5'/%3E%3C/svg%3E")`,
+          backgroundSize: '50px 50px'
+        }}></div>
+      </div>
+      
+      {/* Floating Circles */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {[...Array(8)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute border-2 border-blue-400/20 rounded-full animate-float-slow"
+            style={{
+              width: `${100 + Math.random() * 200}px`,
+              height: `${100 + Math.random() * 200}px`,
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 10}s`,
+              animationDuration: `${15 + Math.random() * 15}s`
+            }}
+          ></div>
+        ))}
+      </div>
+      
+      <div className="max-w-md w-full relative z-10">
         <button
           onClick={() => setCurrentView('landing')}
           className="mb-4 text-blue-400 hover:text-blue-300 flex items-center gap-2 transition-colors"
@@ -806,13 +1021,17 @@ const App = () => {
           <Home className="w-4 h-4" /> Back to Home
         </button>
         
-        <div className="bg-gradient-to-br from-[#2a2f4a]/80 to-[#1e2337]/80 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl p-8">
+        <div className="bg-gradient-to-br from-[#2a2f4a]/80 to-[#1e2337]/80 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl p-8 animate-book-open">
           <div className="text-center mb-8">
-            <div className="bg-gradient-to-br from-blue-500 to-cyan-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-blue-500/50">
-              <Lock className="w-8 h-8 text-white" />
+            <div className="bg-gradient-to-br from-blue-500 to-cyan-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-blue-500/50 relative">
+              <GraduationCap className="w-8 h-8 text-white" />
+              <Library className="w-4 h-4 text-yellow-300 absolute -top-1 -right-1 animate-floating-book" />
             </div>
             <h2 className="text-3xl font-bold text-white">Employee Login</h2>
-            <p className="text-gray-300 mt-2">Access the admin dashboard</p>
+            <p className="text-gray-300 mt-2 flex items-center justify-center gap-2">
+              <BookMarked className="w-4 h-4 text-blue-400" />
+              Access the admin dashboard
+            </p>
           </div>
           
           <form onSubmit={(e) => { e.preventDefault(); setCurrentView('admin_dashboard'); }} className="space-y-6">
@@ -856,16 +1075,43 @@ const App = () => {
 
   // Admin Dashboard
   const AdminDashboard = () => (
-    <div className={`min-h-screen bg-gradient-to-br from-[#1a1f37] via-[#2d1b4e] to-[#1a1f37] p-8 transition-opacity duration-500 ${fadeIn ? 'opacity-100' : 'opacity-0'}`}>
-      <div className="max-w-7xl mx-auto">
+    <div className={`min-h-screen bg-gradient-to-br from-[#1a1f37] via-[#2d1b4e] to-[#1a1f37] p-8 transition-opacity duration-500 ${fadeIn ? 'opacity-100' : 'opacity-0'} relative overflow-hidden`}>
+      {/* Animated Dashboard Background */}
+      <div className="background-orbs">
+        <div className="orb orb-1"></div>
+        <div className="orb orb-2"></div>
+        <div className="orb orb-3"></div>
+        <div className="orb orb-4"></div>
+      </div>
+      
+      {/* Tech Grid Background */}
+      <div className="absolute inset-0 opacity-10 pointer-events-none">
+        <div className="absolute inset-0" style={{
+          backgroundImage: `linear-gradient(rgba(59, 130, 246, 0.1) 2px, transparent 2px), linear-gradient(90deg, rgba(59, 130, 246, 0.1) 2px, transparent 2px)`,
+          backgroundSize: '100px 100px'
+        }}></div>
+      </div>
+      
+      {/* Animated Corner Accents */}
+      <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-blue-500/20 to-transparent rounded-full blur-3xl animate-pulse-slow"></div>
+      <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-purple-500/20 to-transparent rounded-full blur-3xl animate-pulse-slow" style={{ animationDelay: '2s' }}></div>
+      
+      <div className="max-w-7xl mx-auto relative z-10">
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center gap-3">
-            <div className="bg-gradient-to-br from-blue-500 to-cyan-600 p-3 rounded-xl shadow-lg shadow-blue-500/50">
-              <LayoutDashboard className="w-8 h-8 text-white" />
+            <div className="bg-gradient-to-br from-blue-500 to-cyan-600 p-3 rounded-xl shadow-lg shadow-blue-500/50 relative">
+              <Library className="w-8 h-8 text-white animate-floating-book" />
+              <Sparkles className="w-4 h-4 text-yellow-300 absolute -top-1 -right-1 animate-sparkle" />
             </div>
             <div>
-              <h2 className="text-3xl font-bold text-white">Admin Dashboard</h2>
-              <p className="text-sm text-gray-400">Manage and monitor bookfair reservations</p>
+              <h2 className="text-3xl font-bold text-white flex items-center gap-2">
+                Admin Dashboard
+                <BookMarked className="w-6 h-6 text-blue-400 animate-bookmark-drop" />
+              </h2>
+              <p className="text-sm text-gray-400 flex items-center gap-1">
+                <Feather className="w-3 h-3 text-cyan-400" />
+                Manage and monitor bookfair reservations
+              </p>
             </div>
           </div>
           <button
@@ -1140,12 +1386,249 @@ const App = () => {
           }
         }
         
+        @keyframes gradientShift {
+          0%, 100% {
+            background-position: 0% 50%;
+          }
+          50% {
+            background-position: 100% 50%;
+          }
+        }
+        
+        @keyframes float {
+          0%, 100% {
+            transform: translateY(0px) rotate(0deg);
+          }
+          33% {
+            transform: translateY(-20px) rotate(5deg);
+          }
+          66% {
+            transform: translateY(10px) rotate(-5deg);
+          }
+        }
+        
+        @keyframes floatSlow {
+          0%, 100% {
+            transform: translate(0, 0) rotate(0deg);
+          }
+          50% {
+            transform: translate(30px, -30px) rotate(180deg);
+          }
+        }
+        
+        @keyframes pulse {
+          0%, 100% {
+            opacity: 0.4;
+            transform: scale(1);
+          }
+          50% {
+            opacity: 0.8;
+            transform: scale(1.05);
+          }
+        }
+        
+        @keyframes shimmer {
+          0% {
+            transform: translateX(-100%);
+          }
+          100% {
+            transform: translateX(100%);
+          }
+        }
+        
+        @keyframes rotate {
+          from {
+            transform: rotate(0deg);
+          }
+          to {
+            transform: rotate(360deg);
+          }
+        }
+        
+        @keyframes moveInCircle {
+          0% {
+            transform: rotate(0deg);
+          }
+          50% {
+            transform: rotate(180deg);
+          }
+          100% {
+            transform: rotate(360deg);
+          }
+        }
+        
+        @keyframes pageFlip {
+          0%, 100% {
+            transform: rotateY(0deg);
+          }
+          50% {
+            transform: rotateY(180deg);
+          }
+        }
+        
+        @keyframes bookOpen {
+          0% {
+            transform: scaleX(0) rotateY(-90deg);
+            opacity: 0;
+          }
+          50% {
+            transform: scaleX(0.5) rotateY(-45deg);
+            opacity: 0.5;
+          }
+          100% {
+            transform: scaleX(1) rotateY(0deg);
+            opacity: 1;
+          }
+        }
+        
+        @keyframes bookClose {
+          0% {
+            transform: scaleX(1) rotateY(0deg);
+          }
+          100% {
+            transform: scaleX(0) rotateY(90deg);
+          }
+        }
+        
+        @keyframes readingProgress {
+          0% {
+            transform: translateX(-100%);
+          }
+          100% {
+            transform: translateX(100%);
+          }
+        }
+        
+        @keyframes bookmarkDrop {
+          0%, 100% {
+            transform: translateY(-10px);
+            opacity: 0.6;
+          }
+          50% {
+            transform: translateY(0px);
+            opacity: 1;
+          }
+        }
+        
+        @keyframes floatingBook {
+          0%, 100% {
+            transform: translateY(0px) rotateZ(-5deg);
+          }
+          50% {
+            transform: translateY(-20px) rotateZ(5deg);
+          }
+        }
+        
+        @keyframes sparkle {
+          0%, 100% {
+            opacity: 0;
+            transform: scale(0) rotate(0deg);
+          }
+          50% {
+            opacity: 1;
+            transform: scale(1) rotate(180deg);
+          }
+        }
+        
         .animate-fadeIn {
           animation: fadeIn 0.3s ease-out;
         }
         
         .animate-slideUp {
           animation: slideUp 0.3s ease-out;
+        }
+        
+        .animate-gradient {
+          background-size: 200% 200%;
+          animation: gradientShift 8s ease infinite;
+        }
+        
+        .animate-float {
+          animation: float 6s ease-in-out infinite;
+        }
+        
+        .animate-float-slow {
+          animation: floatSlow 20s ease-in-out infinite;
+        }
+        
+        .animate-pulse-slow {
+          animation: pulse 4s ease-in-out infinite;
+        }
+        
+        .animate-rotate {
+          animation: rotate 30s linear infinite;
+        }
+        
+        .animate-page-flip {
+          animation: pageFlip 3s ease-in-out infinite;
+        }
+        
+        .animate-book-open {
+          animation: bookOpen 0.6s ease-out forwards;
+        }
+        
+        .animate-floating-book {
+          animation: floatingBook 4s ease-in-out infinite;
+        }
+        
+        .animate-bookmark-drop {
+          animation: bookmarkDrop 2s ease-in-out infinite;
+        }
+        
+        .animate-sparkle {
+          animation: sparkle 2s ease-in-out infinite;
+        }
+        
+        .background-orbs {
+          position: fixed;
+          inset: 0;
+          overflow: hidden;
+          pointer-events: none;
+          z-index: 0;
+        }
+        
+        .orb {
+          position: absolute;
+          border-radius: 50%;
+          filter: blur(80px);
+          opacity: 0.5;
+          animation: floatSlow 20s ease-in-out infinite;
+        }
+        
+        .orb-1 {
+          width: 500px;
+          height: 500px;
+          background: radial-gradient(circle, rgba(236, 72, 153, 0.4) 0%, rgba(139, 92, 246, 0.2) 50%, transparent 100%);
+          top: -10%;
+          left: -10%;
+          animation-delay: 0s;
+        }
+        
+        .orb-2 {
+          width: 400px;
+          height: 400px;
+          background: radial-gradient(circle, rgba(59, 130, 246, 0.4) 0%, rgba(6, 182, 212, 0.2) 50%, transparent 100%);
+          top: 50%;
+          right: -5%;
+          animation-delay: -5s;
+        }
+        
+        .orb-3 {
+          width: 600px;
+          height: 600px;
+          background: radial-gradient(circle, rgba(139, 92, 246, 0.3) 0%, rgba(236, 72, 153, 0.15) 50%, transparent 100%);
+          bottom: -15%;
+          left: 30%;
+          animation-delay: -10s;
+        }
+        
+        .orb-4 {
+          width: 350px;
+          height: 350px;
+          background: radial-gradient(circle, rgba(16, 185, 129, 0.3) 0%, rgba(132, 204, 22, 0.15) 50%, transparent 100%);
+          top: 20%;
+          left: 50%;
+          animation-delay: -15s;
         }
       `}</style>
       
