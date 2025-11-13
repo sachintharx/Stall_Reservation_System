@@ -87,6 +87,14 @@ const App = () => {
   const [useMapView, setUseMapView] = useState(false);
   const [isPositioningMode, setIsPositioningMode] = useState(false);
   const [hoveredStall, setHoveredStall] = useState(null);
+  const [showStallConfigModal, setShowStallConfigModal] = useState(false);
+  const [stallConfig, setStallConfig] = useState({
+    small: 15,
+    medium: 20,
+    large: 15,
+    namingPattern: 'alphanumeric', // alphanumeric (A1, A2...) or numeric (1, 2, 3...)
+    prefix: '' // optional prefix like 'STALL-', 'BOOTH-', etc.
+  });
 
   // Save map image to localStorage whenever it changes
   useEffect(() => {
@@ -233,6 +241,85 @@ const App = () => {
     setSelectedStalls([]);
     setGenres([]);
     setCurrentView('landing');
+  };
+  
+  const generateStallsFromConfig = () => {
+    const { small, medium, large, namingPattern, prefix } = stallConfig;
+    const totalStalls = small + medium + large;
+    const newStalls = [];
+    
+    let stallNumber = 1;
+    let columnNumber = 1;
+    let rowLetter = 'A';
+    
+    // Helper function to generate ID
+    const generateId = () => {
+      let id;
+      if (namingPattern === 'alphanumeric') {
+        id = `${rowLetter}${columnNumber}`;
+        columnNumber++;
+        if (columnNumber > 10) {
+          columnNumber = 1;
+          rowLetter = String.fromCharCode(rowLetter.charCodeAt(0) + 1);
+        }
+      } else {
+        id = `${stallNumber}`;
+        stallNumber++;
+      }
+      return prefix ? `${prefix}${id}` : id;
+    };
+    
+    // Generate small stalls
+    for (let i = 0; i < small; i++) {
+      newStalls.push({
+        id: generateId(),
+        size: 'Small',
+        price: 100,
+        reserved: false,
+        businessName: null,
+        email: null,
+        mapPosition: null
+      });
+    }
+    
+    // Generate medium stalls
+    for (let i = 0; i < medium; i++) {
+      newStalls.push({
+        id: generateId(),
+        size: 'Medium',
+        price: 150,
+        reserved: false,
+        businessName: null,
+        email: null,
+        mapPosition: null
+      });
+    }
+    
+    // Generate large stalls
+    for (let i = 0; i < large; i++) {
+      newStalls.push({
+        id: generateId(),
+        size: 'Large',
+        price: 200,
+        reserved: false,
+        businessName: null,
+        email: null,
+        mapPosition: null
+      });
+    }
+    
+    // Update stalls and show confirmation
+    setStalls(newStalls);
+    const prefixText = prefix ? ` with prefix "${prefix}"` : '';
+    alert(`✅ Generated ${totalStalls} stalls${prefixText}!\n\n${small} Small\n${medium} Medium\n${large} Large\n\nNext: Upload a map and position these stalls.`);
+  };
+  
+  const deleteStall = (stallId) => {
+    if (window.confirm(`Are you sure you want to delete stall ${stallId}?\n\nThis action cannot be undone.`)) {
+      const updatedStalls = stalls.filter(stall => stall.id !== stallId);
+      setStalls(updatedStalls);
+      alert(`🗑️ Stall ${stallId} has been deleted successfully!`);
+    }
   };
   
   const handleImageUpload = (e) => {
@@ -1786,6 +1873,22 @@ const App = () => {
                 )}
               </button>
               <button
+                onClick={() => setAdminTab('stallconfig')}
+                className={`px-6 py-3 font-semibold transition-all rounded-t-xl relative ${
+                  adminTab === 'stallconfig'
+                    ? 'text-white'
+                    : 'text-gray-400 hover:text-gray-200'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <Building className="w-5 h-5" />
+                  Stall Configuration
+                </div>
+                {adminTab === 'stallconfig' && (
+                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-pink-500 to-purple-600 rounded-full"></div>
+                )}
+              </button>
+              <button
                 onClick={() => setAdminTab('mapupload')}
                 className={`px-6 py-3 font-semibold transition-all rounded-t-xl relative ${
                   adminTab === 'mapupload'
@@ -1794,7 +1897,7 @@ const App = () => {
                 }`}
               >
                 <div className="flex items-center gap-2">
-                  <Building className="w-5 h-5" />
+                  <MapPin className="w-5 h-5" />
                   Map Management
                 </div>
                 {adminTab === 'mapupload' && (
@@ -1831,7 +1934,7 @@ const App = () => {
                     return (
                       <div
                         key={stall.id}
-                        className={`aspect-square rounded-lg font-semibold text-sm flex flex-col items-center justify-center shadow-lg transition-transform hover:scale-110 ${
+                        className={`aspect-square rounded-lg font-semibold text-sm flex flex-col items-center justify-center shadow-lg transition-all hover:scale-110 relative group ${
                           stall.reserved
                             ? 'bg-gradient-to-br from-gray-600 to-gray-700 text-gray-300'
                             : 'bg-gradient-to-br from-green-400 to-emerald-500 text-white shadow-green-500/30'
@@ -1839,6 +1942,13 @@ const App = () => {
                       >
                         <span className="text-xs font-bold">{stall.id}</span>
                         <span className="text-[10px] mt-0.5 opacity-75">{stall.size[0].toUpperCase()}</span>
+                        <button
+                          onClick={() => deleteStall(stall.id)}
+                          className="absolute -top-1 -right-1 bg-red-500 hover:bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                          title="Delete stall"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
                       </div>
                     );
                   })}
@@ -1893,6 +2003,134 @@ const App = () => {
                       <p className="text-gray-400">No reservations yet</p>
                     </div>
                   )}
+                </div>
+              </div>
+            )}
+            
+            {adminTab === 'stallconfig' && (
+              <div>
+                <div className="bg-gradient-to-br from-indigo-500/10 to-purple-600/10 border border-indigo-500/20 rounded-2xl p-8 mb-6">
+                  <div className="flex items-start gap-4 mb-6">
+                    <div className="bg-gradient-to-br from-indigo-500 to-purple-600 p-3 rounded-xl">
+                      <Building className="w-6 h-6 text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-xl font-bold text-white mb-2">Configure Stalls</h3>
+                      <p className="text-gray-300 text-sm">Set the number of stalls by size and choose naming pattern. This will generate all stalls for the event.</p>
+                    </div>
+                  </div>
+                  
+                  <div className="grid md:grid-cols-3 gap-6 mb-6">
+                    {/* Small Stalls */}
+                    <div className="bg-[#1a1f37]/50 rounded-xl p-5 border border-white/10">
+                      <label className="block text-sm font-semibold text-gray-300 mb-3">Small Stalls</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={stallConfig.small}
+                        onChange={(e) => setStallConfig({...stallConfig, small: parseInt(e.target.value) || 0})}
+                        className="w-full px-4 py-3 bg-[#0d1229] border border-white/10 rounded-lg text-white focus:outline-none focus:border-green-500 transition"
+                      />
+                      <p className="text-xs text-gray-400 mt-2">Compact spaces for small vendors</p>
+                    </div>
+                    
+                    {/* Medium Stalls */}
+                    <div className="bg-[#1a1f37]/50 rounded-xl p-5 border border-white/10">
+                      <label className="block text-sm font-semibold text-gray-300 mb-3">Medium Stalls</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={stallConfig.medium}
+                        onChange={(e) => setStallConfig({...stallConfig, medium: parseInt(e.target.value) || 0})}
+                        className="w-full px-4 py-3 bg-[#0d1229] border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500 transition"
+                      />
+                      <p className="text-xs text-gray-400 mt-2">Standard size stalls</p>
+                    </div>
+                    
+                    {/* Large Stalls */}
+                    <div className="bg-[#1a1f37]/50 rounded-xl p-5 border border-white/10">
+                      <label className="block text-sm font-semibold text-gray-300 mb-3">Large Stalls</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={stallConfig.large}
+                        onChange={(e) => setStallConfig({...stallConfig, large: parseInt(e.target.value) || 0})}
+                        className="w-full px-4 py-3 bg-[#0d1229] border border-white/10 rounded-lg text-white focus:outline-none focus:border-purple-500 transition"
+                      />
+                      <p className="text-xs text-gray-400 mt-2">Premium large spaces</p>
+                    </div>
+                  </div>
+                  
+                  {/* Stall Name Prefix */}
+                  <div className="bg-[#1a1f37]/50 rounded-xl p-5 border border-white/10 mb-6">
+                    <label className="block text-sm font-semibold text-gray-300 mb-3">Stall Name Prefix (Optional)</label>
+                    <input
+                      type="text"
+                      placeholder="e.g., STALL-, BOOTH-, etc."
+                      value={stallConfig.prefix}
+                      onChange={(e) => setStallConfig({...stallConfig, prefix: e.target.value})}
+                      className="w-full px-4 py-3 bg-[#0d1229] border border-white/10 rounded-lg text-white focus:outline-none focus:border-cyan-500 transition placeholder-gray-500"
+                    />
+                    <p className="text-xs text-gray-400 mt-2">
+                      Leave empty for no prefix, or add text like "STALL-" to create names like STALL-A1, STALL-A2...
+                    </p>
+                  </div>
+                  
+                  {/* Naming Pattern */}
+                  <div className="bg-[#1a1f37]/50 rounded-xl p-5 border border-white/10 mb-6">
+                    <label className="block text-sm font-semibold text-gray-300 mb-3">Stall Naming Pattern</label>
+                    <div className="flex gap-4">
+                      <button
+                        onClick={() => setStallConfig({...stallConfig, namingPattern: 'alphanumeric'})}
+                        className={`flex-1 px-6 py-4 rounded-xl font-semibold transition ${
+                          stallConfig.namingPattern === 'alphanumeric'
+                            ? 'bg-gradient-to-r from-blue-500 to-cyan-600 text-white shadow-lg'
+                            : 'bg-[#0d1229] text-gray-400 border border-white/10 hover:border-blue-500/50'
+                        }`}
+                      >
+                        <div className="text-lg mb-1">{stallConfig.prefix || ''}A1, A2, B1, B2...</div>
+                        <div className="text-xs opacity-75">Alphanumeric (Rows & Columns)</div>
+                      </button>
+                      <button
+                        onClick={() => setStallConfig({...stallConfig, namingPattern: 'numeric'})}
+                        className={`flex-1 px-6 py-4 rounded-xl font-semibold transition ${
+                          stallConfig.namingPattern === 'numeric'
+                            ? 'bg-gradient-to-r from-blue-500 to-cyan-600 text-white shadow-lg'
+                            : 'bg-[#0d1229] text-gray-400 border border-white/10 hover:border-blue-500/50'
+                        }`}
+                      >
+                        <div className="text-lg mb-1">{stallConfig.prefix || ''}1, 2, 3, 4...</div>
+                        <div className="text-xs opacity-75">Simple Numeric</div>
+                      </button>
+                    </div>
+                  </div>
+                  
+                  {/* Summary */}
+                  <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20 rounded-xl p-5 mb-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-white font-bold text-lg mb-1">Total Stalls: {stallConfig.small + stallConfig.medium + stallConfig.large}</p>
+                        <p className="text-gray-300 text-sm">
+                          {stallConfig.small} Small • {stallConfig.medium} Medium • {stallConfig.large} Large
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-blue-400 text-sm font-semibold">Naming: {stallConfig.namingPattern === 'alphanumeric' ? 'A1, A2...' : '1, 2, 3...'}</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <button
+                    onClick={generateStallsFromConfig}
+                    className="w-full py-4 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl font-bold hover:from-indigo-600 hover:to-purple-700 transition transform hover:scale-105 shadow-lg flex items-center justify-center gap-2"
+                  >
+                    <CheckCircle className="w-5 h-5" />
+                    Generate Stalls
+                  </button>
+                  
+                  <p className="text-xs text-gray-400 text-center mt-4">
+                    ⚠️ This will replace existing stall configuration. Make sure to position stalls on the map after generation.
+                  </p>
                 </div>
               </div>
             )}
