@@ -52,6 +52,9 @@ const App = () => {
   const [registeredVendors, setRegisteredVendors] = useState([
     { email: 'vendor1@bookfair.com', password: 'vendor123', businessName: 'Demo Bookstore' }
   ]);
+  const [stallMapImage, setStallMapImage] = useState(null);
+  const [showImageUploadModal, setShowImageUploadModal] = useState(false);
+  const [useMapView, setUseMapView] = useState(false);
   
   // Predefined admin credentials
   const adminCredentials = [
@@ -157,6 +160,40 @@ const App = () => {
     setSelectedStalls([]);
     setGenres([]);
     setCurrentView('landing');
+  };
+  
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file && file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setStallMapImage(reader.result);
+        setShowImageUploadModal(false);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+  
+  const handleMapClick = (e) => {
+    if (!stallMapImage) return;
+    
+    const rect = e.target.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    
+    // Find nearest stall based on click position
+    const clickedStall = stalls.find(stall => {
+      if (!stall.mapPosition || stall.isEmpty) return false;
+      const distance = Math.sqrt(
+        Math.pow(stall.mapPosition.x - x, 2) + 
+        Math.pow(stall.mapPosition.y - y, 2)
+      );
+      return distance < 5; // 5% tolerance
+    });
+    
+    if (clickedStall && !clickedStall.reserved) {
+      handleStallClick(clickedStall);
+    }
   };
 
   const stats = {
@@ -821,6 +858,21 @@ const App = () => {
               </div>
             </div>
             
+            {/* View Toggle and Legend */}
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                {stallMapImage && (
+                  <button
+                    onClick={() => setUseMapView(!useMapView)}
+                    className="bg-gradient-to-r from-purple-500 to-indigo-600 text-white px-4 py-2 rounded-xl font-semibold hover:from-purple-600 hover:to-indigo-700 transition transform hover:scale-105 flex items-center gap-2 shadow-lg"
+                  >
+                    {useMapView ? <LayoutDashboard className="w-4 h-4" /> : <MapPin className="w-4 h-4" />}
+                    {useMapView ? 'Grid View' : 'Map View'}
+                  </button>
+                )}
+              </div>
+            </div>
+            
             {/* Legend */}
             <div className="grid grid-cols-4 gap-3 mb-6">
               <div className="flex items-center gap-2 bg-[#1a1f37]/50 rounded-xl p-3 border border-white/5">
@@ -841,40 +893,84 @@ const App = () => {
               </div>
             </div>
             
-            {/* Stall Grid */}
-            <div className="grid grid-cols-10 gap-2 mb-6 p-4 bg-[#1a1f37]/30 rounded-2xl">
-              {stalls.map((stall, idx) => {
-                if (stall.isEmpty) {
-                  return <div key={idx} className="aspect-square border-2 border-dashed border-gray-600 rounded-lg"></div>;
-                }
-                
-                const isSelected = selectedStalls.includes(stall.id);
-                const isReserved = stall.reserved;
-                
-                return (
-                  <button
-                    key={stall.id}
-                    onClick={() => handleStallClick(stall)}
-                    disabled={isReserved}
-                    className={`aspect-square rounded-lg font-semibold text-sm flex flex-col items-center justify-center transition-all duration-200 relative group ${
-                      isSelected
-                        ? 'bg-gradient-to-br from-pink-500 to-purple-600 text-white ring-4 ring-pink-400/50 transform scale-105 shadow-lg shadow-pink-500/50'
-                        : isReserved
-                        ? 'bg-gradient-to-br from-gray-600 to-gray-700 text-gray-400 cursor-not-allowed opacity-50'
-                        : 'bg-gradient-to-br from-green-400 to-emerald-500 text-white hover:scale-110 hover:shadow-xl hover:shadow-green-500/50 cursor-pointer hover:z-10'
-                    }`}
-                  >
-                    <span className="text-xs font-bold">{stall.id}</span>
-                    <span className="text-[10px] mt-0.5 opacity-75">{stall.size[0].toUpperCase()}</span>
-                    {isSelected && (
-                      <div className="absolute -top-1 -right-1 bg-yellow-400 rounded-full p-0.5">
-                        <CheckCircle className="w-3 h-3 text-purple-900" />
+            {/* Stall Grid or Map View */}
+            {useMapView && stallMapImage ? (
+              <div className="mb-6 p-4 bg-[#1a1f37]/30 rounded-2xl relative">
+                <div className="relative">
+                  <img 
+                    src={stallMapImage} 
+                    alt="Stall Map" 
+                    className="w-full h-auto rounded-xl"
+                    onClick={handleMapClick}
+                    style={{ cursor: 'pointer' }}
+                  />
+                  {/* Overlay selected stalls on map */}
+                  {stalls.map((stall) => {
+                    if (!stall.mapPosition || stall.isEmpty) return null;
+                    const isSelected = selectedStalls.includes(stall.id);
+                    const isReserved = stall.reserved;
+                    
+                    return (
+                      <div
+                        key={stall.id}
+                        className={`absolute transform -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
+                          isSelected
+                            ? 'bg-pink-500 text-white ring-4 ring-pink-400/50 scale-125 shadow-lg shadow-pink-500/50'
+                            : isReserved
+                            ? 'bg-gray-600 text-gray-400 opacity-50'
+                            : 'bg-green-500 text-white hover:scale-110 cursor-pointer'
+                        }`}
+                        style={{
+                          left: `${stall.mapPosition.x}%`,
+                          top: `${stall.mapPosition.y}%`
+                        }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (!isReserved) handleStallClick(stall);
+                        }}
+                      >
+                        {stall.id}
                       </div>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
+                    );
+                  })}
+                </div>
+                <p className="text-xs text-gray-400 text-center mt-3">Click on stalls in the map to select them</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-10 gap-2 mb-6 p-4 bg-[#1a1f37]/30 rounded-2xl">
+                {stalls.map((stall, idx) => {
+                  if (stall.isEmpty) {
+                    return <div key={idx} className="aspect-square border-2 border-dashed border-gray-600 rounded-lg"></div>;
+                  }
+                  
+                  const isSelected = selectedStalls.includes(stall.id);
+                  const isReserved = stall.reserved;
+                  
+                  return (
+                    <button
+                      key={stall.id}
+                      onClick={() => handleStallClick(stall)}
+                      disabled={isReserved}
+                      className={`aspect-square rounded-lg font-semibold text-sm flex flex-col items-center justify-center transition-all duration-200 relative group ${
+                        isSelected
+                          ? 'bg-gradient-to-br from-pink-500 to-purple-600 text-white ring-4 ring-pink-400/50 transform scale-105 shadow-lg shadow-pink-500/50'
+                          : isReserved
+                          ? 'bg-gradient-to-br from-gray-600 to-gray-700 text-gray-400 cursor-not-allowed opacity-50'
+                          : 'bg-gradient-to-br from-green-400 to-emerald-500 text-white hover:scale-110 hover:shadow-xl hover:shadow-green-500/50 cursor-pointer hover:z-10'
+                      }`}
+                    >
+                      <span className="text-xs font-bold">{stall.id}</span>
+                      <span className="text-[10px] mt-0.5 opacity-75">{stall.size[0].toUpperCase()}</span>
+                      {isSelected && (
+                        <div className="absolute -top-1 -right-1 bg-yellow-400 rounded-full p-0.5">
+                          <CheckCircle className="w-3 h-3 text-purple-900" />
+                        </div>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
             
             <button
               onClick={() => setShowConfirmModal(true)}
@@ -1418,6 +1514,22 @@ const App = () => {
                   <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-pink-500 to-purple-600 rounded-full"></div>
                 )}
               </button>
+              <button
+                onClick={() => setAdminTab('mapupload')}
+                className={`px-6 py-3 font-semibold transition-all rounded-t-xl relative ${
+                  adminTab === 'mapupload'
+                    ? 'text-white'
+                    : 'text-gray-400 hover:text-gray-200'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <Building className="w-5 h-5" />
+                  Map Management
+                </div>
+                {adminTab === 'mapupload' && (
+                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-pink-500 to-purple-600 rounded-full"></div>
+                )}
+              </button>
             </div>
             
             {adminTab === 'availability' && (
@@ -1510,6 +1622,81 @@ const App = () => {
                       <p className="text-gray-400">No reservations yet</p>
                     </div>
                   )}
+                </div>
+              </div>
+            )}
+            
+            {adminTab === 'mapupload' && (
+              <div>
+                <div className="bg-gradient-to-br from-purple-500/10 to-indigo-600/10 border border-purple-500/20 rounded-2xl p-8 mb-6">
+                  <div className="flex items-start gap-4 mb-6">
+                    <div className="bg-gradient-to-br from-purple-500 to-indigo-600 p-3 rounded-xl">
+                      <MapPin className="w-6 h-6 text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-xl font-bold text-white mb-2">Upload Stall Map</h3>
+                      <p className="text-gray-300 text-sm">Upload a floor plan or map image that shows the layout of all stalls. Vendors will be able to select stalls by clicking on the map.</p>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    <label className="block">
+                      <div className="border-2 border-dashed border-purple-500/30 rounded-xl p-8 text-center hover:border-purple-500/50 transition cursor-pointer bg-[#1a1f37]/30">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleImageUpload}
+                          className="hidden"
+                          id="map-upload"
+                        />
+                        <label htmlFor="map-upload" className="cursor-pointer">
+                          <div className="flex flex-col items-center gap-3">
+                            <div className="bg-gradient-to-br from-purple-500 to-indigo-600 p-4 rounded-full">
+                              <Building className="w-8 h-8 text-white" />
+                            </div>
+                            <div>
+                              <p className="text-white font-semibold mb-1">Click to upload map image</p>
+                              <p className="text-gray-400 text-sm">PNG, JPG, or SVG (Max 10MB)</p>
+                            </div>
+                          </div>
+                        </label>
+                      </div>
+                    </label>
+                    
+                    {stallMapImage && (
+                      <div className="bg-[#1a1f37]/50 rounded-xl p-4 border border-white/10">
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center gap-2">
+                            <CheckCircle className="w-5 h-5 text-green-400" />
+                            <span className="text-white font-semibold">Map Uploaded Successfully</span>
+                          </div>
+                          <button
+                            onClick={() => setStallMapImage(null)}
+                            className="text-red-400 hover:text-red-300 transition"
+                          >
+                            <X className="w-5 h-5" />
+                          </button>
+                        </div>
+                        <img src={stallMapImage} alt="Stall Map Preview" className="w-full h-auto rounded-lg" />
+                        <p className="text-xs text-gray-400 mt-3">Vendors can now select stalls by clicking on this map</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                
+                <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4">
+                  <div className="flex items-start gap-3">
+                    <div className="text-blue-400 mt-1">ℹ️</div>
+                    <div className="text-sm text-gray-300">
+                      <p className="font-semibold text-white mb-1">How it works:</p>
+                      <ul className="list-disc list-inside space-y-1 text-xs">
+                        <li>Upload a clear floor plan or map showing all stall locations</li>
+                        <li>Vendors will see a toggle to switch between Grid View and Map View</li>
+                        <li>They can click directly on stalls in the map to select them</li>
+                        <li>Selected stalls will be highlighted in pink, reserved in gray, and available in green</li>
+                      </ul>
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
