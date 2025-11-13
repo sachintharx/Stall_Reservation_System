@@ -61,7 +61,10 @@ const App = () => {
   const isAdminRoute = window.location.pathname === '/admin' || window.location.pathname === '/admin/';
   
   const [currentView, setCurrentView] = useState(isAdminRoute ? 'admin_landing' : 'landing');
-  const [stalls, setStalls] = useState(generateInitialStalls());
+  const [stalls, setStalls] = useState(() => {
+    const savedStalls = localStorage.getItem('tradeHallStalls');
+    return savedStalls ? JSON.parse(savedStalls) : generateInitialStalls();
+  });
   const [selectedStalls, setSelectedStalls] = useState([]);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [vendorInfo, setVendorInfo] = useState({ businessName: '', email: '', password: '' });
@@ -89,8 +92,33 @@ const App = () => {
   useEffect(() => {
     if (stallMapImage) {
       localStorage.setItem('tradeHallMap', stallMapImage);
+      console.log('🗺️ Map saved to localStorage');
     }
   }, [stallMapImage]);
+
+  // Save stalls to localStorage whenever they change (positions or reservations)
+  useEffect(() => {
+    localStorage.setItem('tradeHallStalls', JSON.stringify(stalls));
+    const positionedCount = stalls.filter(s => s.mapPosition && !s.isEmpty).length;
+    console.log(`💾 Stalls saved to localStorage (${positionedCount} positioned)`);
+  }, [stalls]);
+
+  // Listen for storage changes from other tabs/windows
+  useEffect(() => {
+    const handleStorageChange = (e) => {
+      if (e.key === 'tradeHallMap' && e.newValue) {
+        console.log('🔄 Map updated from another tab');
+        setStallMapImage(e.newValue);
+      }
+      if (e.key === 'tradeHallStalls' && e.newValue) {
+        console.log('🔄 Stalls updated from another tab');
+        setStalls(JSON.parse(e.newValue));
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
   
   // Predefined admin credentials
   const adminCredentials = [
@@ -216,7 +244,7 @@ const App = () => {
         setShowImageUploadModal(false);
         // Notify admin that map is now available to vendors
         setTimeout(() => {
-          alert('✅ Trade Hall map uploaded successfully!\n\nVendors can now:\n• Switch to Map View\n• See your uploaded floor plan\n• Click on stalls to select them');
+          alert('✅ Trade Hall map uploaded successfully!\n\nNext steps:\n1. Click "Position Stalls" to place stall markers\n2. Click a stall ID, then click on the map\n3. Vendors will see your configured map with positioned stalls');
         }, 100);
       };
       reader.readAsDataURL(file);
@@ -244,6 +272,7 @@ const App = () => {
         );
         setStalls(updatedStalls);
         setHoveredStall(null);
+        // Positions are automatically saved to localStorage via useEffect
       }
       return;
     }
@@ -952,6 +981,25 @@ const App = () => {
                     <span className="text-blue-300 text-sm font-semibold">📊 Grid View Active</span>
                   </div>
                 )}
+                {/* Debug Info */}
+                <div className="bg-gray-500/10 border border-gray-400/20 px-3 py-1 rounded-lg">
+                  <span className="text-gray-400 text-xs">
+                    Map: {stallMapImage ? '✓' : '✗'} | Positioned: {stalls.filter(s => s.mapPosition && !s.isEmpty).length}
+                  </span>
+                </div>
+                <button
+                  onClick={() => {
+                    const savedMap = localStorage.getItem('tradeHallMap');
+                    const savedStalls = localStorage.getItem('tradeHallStalls');
+                    if (savedMap) setStallMapImage(savedMap);
+                    if (savedStalls) setStalls(JSON.parse(savedStalls));
+                    alert('🔄 Reloaded data from localStorage!');
+                  }}
+                  className="bg-cyan-500/20 border border-cyan-400/30 px-3 py-1 rounded-lg hover:bg-cyan-500/30 transition"
+                  title="Reload map data"
+                >
+                  <span className="text-cyan-300 text-xs font-semibold">🔄 Sync</span>
+                </button>
               </div>
             </div>
 
@@ -968,9 +1016,12 @@ const App = () => {
                       <p className="text-gray-300 text-sm">
                         ✨ Click directly on any stall marker on the floor plan to select it
                       </p>
-                      <p className="text-blue-400 text-xs mt-1">
-                        {stalls.filter(s => s.mapPosition && !s.isEmpty).length} stalls positioned by admin
-                      </p>
+                      <div className="flex items-center gap-3 mt-2">
+                        <p className="text-blue-400 text-xs">
+                          💾 {stalls.filter(s => s.mapPosition && !s.isEmpty).length} stalls positioned by admin
+                        </p>
+                        <span className="text-green-400 text-xs font-semibold">✓ Synced from admin</span>
+                      </div>
                     </div>
                   </div>
                   <div className="text-right">
@@ -1894,6 +1945,9 @@ const App = () => {
                             <span className="text-white font-semibold">Map Uploaded Successfully</span>
                           </div>
                           <div className="flex items-center gap-2">
+                            <div className="bg-green-500/20 px-3 py-1 rounded-full">
+                              <span className="text-green-300 text-xs font-semibold">💾 Saved to localStorage</span>
+                            </div>
                             <button
                               onClick={() => setIsPositioningMode(!isPositioningMode)}
                               className={`px-4 py-2 rounded-lg font-semibold text-sm transition flex items-center gap-2 ${
@@ -1920,7 +1974,7 @@ const App = () => {
                               <MapPin className="w-5 h-5 text-orange-400 flex-shrink-0 mt-0.5" />
                               <div>
                                 <p className="text-sm text-white font-semibold mb-1">Positioning Mode Active</p>
-                                <p className="text-xs text-gray-300">Click on a stall below, then click on the map where it should appear</p>
+                                <p className="text-xs text-gray-300 mb-2">Click on a stall below, then click on the map where it should appear. Positions are automatically saved for vendors to see.</p>
                               </div>
                             </div>
                             
