@@ -423,6 +423,94 @@ const SuperAdminPortal = () => {
 
   // Super Admin Dashboard
   const SuperAdminDashboard = () => {
+    // Admin-like booking management helpers
+    const pendingRequests = stalls.filter(s => s.pending);
+    const reservedStalls = stalls.filter(s => s.reserved && !s.pending);
+    const totalStalls = stalls.filter(s => !s.isEmpty).length;
+    const availableStalls = stalls.filter(s => !s.isEmpty && !s.reserved && !s.pending).length;
+    const bookingData = [
+      { label: 'Pending', value: pendingRequests.length, color: '#f97316' },
+      { label: 'Approved', value: reservedStalls.length, color: '#22c55e' },
+      { label: 'Available', value: availableStalls, color: '#3b82f6' }
+    ];
+    const PieChart = ({ data, size = 160 }) => {
+      const total = data.reduce((a, d) => a + d.value, 0);
+      if (total === 0) {
+        return (
+          <div className="w-40 h-40 flex items-center justify-center text-xs text-gray-400 border border-white/10 rounded-full">
+            No Data
+          </div>
+        );
+      }
+      let cumulative = 0;
+      const radius = 16; // Using 32x32 viewBox
+      return (
+        <svg viewBox="0 0 32 32" width={size} height={size} className="drop-shadow">
+          {data.map((d, i) => {
+            if (d.value === 0) return null;
+            const startRatio = cumulative / total;
+            cumulative += d.value;
+            const endRatio = cumulative / total;
+            const startAngle = 2 * Math.PI * startRatio;
+            const endAngle = 2 * Math.PI * endRatio;
+            const largeArc = endRatio - startRatio > 0.5 ? 1 : 0;
+            const startX = 16 + radius * Math.cos(startAngle);
+            const startY = 16 + radius * Math.sin(startAngle);
+            const endX = 16 + radius * Math.cos(endAngle);
+            const endY = 16 + radius * Math.sin(endAngle);
+            const pathData = `M16 16 L ${startX} ${startY} A ${radius} ${radius} 0 ${largeArc} 1 ${endX} ${endY} Z`;
+            return (
+              <path
+                key={i}
+                d={pathData}
+                fill={d.color}
+                className="hover:opacity-90 transition-opacity"
+              >
+              </path>
+            );
+          })}
+          <circle cx="16" cy="16" r="8" fill="#1a1f37" className="opacity-90" />
+          <text x="16" y="16" textAnchor="middle" dominantBaseline="middle" className="fill-white text-xs font-bold">
+            {totalStalls}
+          </text>
+        </svg>
+      );
+    };
+    const approveBooking = (stallId) => {
+      const updated = stalls.map(stall => {
+        if (stall.id === stallId && stall.pending) {
+          return {
+            ...stall,
+            pending: false,
+            reserved: true,
+            status: 'approved',
+            approvedDate: new Date().toISOString()
+          };
+        }
+        return stall;
+      });
+      setStalls(updated);
+      alert('✅ Booking approved. Vendor notified.');
+    };
+    const rejectBooking = (stallId) => {
+      const updated = stalls.map(stall => {
+        if (stall.id === stallId && stall.pending) {
+          return {
+            ...stall,
+            pending: false,
+            reserved: false,
+            status: 'rejected',
+            businessName: null,
+            email: null,
+            requestDate: null,
+            approvedDate: null
+          };
+        }
+        return stall;
+      });
+      setStalls(updated);
+      alert('❌ Booking request rejected. Stall released.');
+    };
     return (
       <div className={`min-h-screen bg-gradient-to-br from-[#1a1f37] via-[#4a1b2d] to-[#1a1f37] p-8 transition-opacity duration-500 ${fadeIn ? 'opacity-100' : 'opacity-0'} relative overflow-hidden`}>
         <div className="background-orbs">
@@ -456,6 +544,42 @@ const SuperAdminPortal = () => {
               <LogOut className="w-5 h-5" />
               Logout
             </button>
+          </div>
+
+          {/* Booking Status Overview */}
+          <div className="grid md:grid-cols-3 gap-6 mb-8">
+            <div className="md:col-span-1 bg-gradient-to-br from-[#2a2f4a]/80 to-[#1e2337]/80 backdrop-blur-xl rounded-3xl border border-white/10 p-6 flex flex-col items-center justify-center">
+              <h3 className="text-sm font-semibold text-gray-300 mb-3">Booking Status</h3>
+              <PieChart data={bookingData} />
+              <div className="mt-4 space-y-2 w-full">
+                {bookingData.map(d => (
+                  <div key={d.label} className="flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-2">
+                      <span className="w-3 h-3 rounded-full" style={{ background: d.color }}></span>
+                      <span className="text-gray-300 font-medium">{d.label}</span>
+                    </div>
+                    <span className="text-gray-400">{d.value}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="md:col-span-2 grid sm:grid-cols-3 gap-6">
+              <div className="bg-gradient-to-br from-blue-500/10 to-purple-600/10 border border-blue-500/30 rounded-2xl p-5">
+                <div className="text-xs text-gray-400 mb-1">AVAILABLE</div>
+                <div className="text-3xl font-bold text-white">{availableStalls}</div>
+                <div className="text-xs text-gray-400 mt-2">Total {totalStalls} stalls</div>
+              </div>
+              <div className="bg-gradient-to-br from-orange-500/10 to-yellow-600/10 border border-orange-500/30 rounded-2xl p-5">
+                <div className="text-xs text-gray-400 mb-1">PENDING</div>
+                <div className="text-3xl font-bold text-white">{pendingRequests.length}</div>
+                <div className="text-xs text-gray-400 mt-2">Awaiting review</div>
+              </div>
+              <div className="bg-gradient-to-br from-green-500/10 to-emerald-600/10 border border-green-500/30 rounded-2xl p-5">
+                <div className="text-xs text-gray-400 mb-1">APPROVED</div>
+                <div className="text-3xl font-bold text-white">{reservedStalls.length}</div>
+                <div className="text-xs text-gray-400 mt-2">Confirmed bookings</div>
+              </div>
+            </div>
           </div>
 
           <div className="bg-gradient-to-br from-[#2a2f4a]/80 to-[#1e2337]/80 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl p-8">
@@ -502,6 +626,54 @@ const SuperAdminPortal = () => {
                   Map Management
                 </div>
                 {superAdminTab === 'mapupload' && (
+                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full"></div>
+                )}
+              </button>
+              <button
+                type="button"
+                onClick={() => setSuperAdminTab('requests')}
+                className={`px-6 py-3 font-semibold transition-all rounded-t-xl relative whitespace-nowrap ${
+                  superAdminTab === 'requests' ? 'text-white' : 'text-gray-400 hover:text-gray-200'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="w-5 h-5" />
+                  Booking Requests
+                  {pendingRequests.length > 0 && (
+                    <span className="ml-2 bg-orange-500/30 text-orange-300 text-xs px-2 py-1 rounded-full font-semibold">{pendingRequests.length}</span>
+                  )}
+                </div>
+                {superAdminTab === 'requests' && (
+                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full"></div>
+                )}
+              </button>
+              <button
+                type="button"
+                onClick={() => setSuperAdminTab('availability')}
+                className={`px-6 py-3 font-semibold transition-all rounded-t-xl relative whitespace-nowrap ${
+                  superAdminTab === 'availability' ? 'text-white' : 'text-gray-400 hover:text-gray-200'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <Building className="w-5 h-5" />
+                  Availability
+                </div>
+                {superAdminTab === 'availability' && (
+                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full"></div>
+                )}
+              </button>
+              <button
+                type="button"
+                onClick={() => setSuperAdminTab('reservations')}
+                className={`px-6 py-3 font-semibold transition-all rounded-t-xl relative whitespace-nowrap ${
+                  superAdminTab === 'reservations' ? 'text-white' : 'text-gray-400 hover:text-gray-200'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="w-5 h-5" />
+                  Reservations
+                </div>
+                {superAdminTab === 'reservations' && (
                   <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full"></div>
                 )}
               </button>
@@ -806,6 +978,111 @@ const SuperAdminPortal = () => {
                     )}
                   </div>
                 </div>
+              </div>
+            )}
+            {/* Booking Requests Tab (Admin privileges) */}
+            {superAdminTab === 'requests' && (
+              <div>
+                <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+                  <CheckCircle className="w-6 h-6 text-orange-400" /> Pending Booking Requests
+                </h2>
+                {pendingRequests.length === 0 ? (
+                  <div className="bg-[#1a1f37]/50 border border-white/10 rounded-xl p-8 text-center text-gray-400">
+                    No pending requests at the moment.
+                  </div>
+                ) : (
+                  <div className="grid md:grid-cols-2 gap-5">
+                    {pendingRequests.map(stall => (
+                      <div key={stall.id} className="bg-[#1a1f37]/50 border border-orange-500/40 rounded-xl p-6 relative">
+                        <div className="flex justify-between items-start mb-3">
+                          <div>
+                            <div className="text-xl font-bold text-white">{stall.id}</div>
+                            <div className="text-xs text-gray-400">Size: {stall.size}</div>
+                            <div className="mt-2 text-sm text-gray-300">
+                              <span className="font-semibold text-pink-300">{stall.businessName}</span>
+                              <br />
+                              <span className="text-xs text-gray-400">{stall.email}</span>
+                            </div>
+                          </div>
+                          <span className="text-xs bg-orange-500/30 text-orange-300 px-2 py-1 rounded-full font-semibold">Pending</span>
+                        </div>
+                        <div className="text-xs text-gray-400 mb-4">
+                          Requested: {stall.requestDate ? new Date(stall.requestDate).toLocaleString() : '—'}
+                        </div>
+                        <div className="flex gap-3">
+                          <button
+                            type="button"
+                            onClick={() => approveBooking(stall.id)}
+                            className="flex-1 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg font-semibold hover:from-green-600 hover:to-emerald-700 transition flex items-center justify-center gap-2"
+                          >
+                            <CheckCircle className="w-4 h-4" /> Approve
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => rejectBooking(stall.id)}
+                            className="flex-1 py-2 bg-gradient-to-r from-red-500 to-pink-600 text-white rounded-lg font-semibold hover:from-red-600 hover:to-pink-700 transition flex items-center justify-center gap-2"
+                          >
+                            <X className="w-4 h-4" /> Reject
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+            {/* Availability Tab */}
+            {superAdminTab === 'availability' && (
+              <div>
+                <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+                  <Building className="w-6 h-6 text-blue-400" /> Stall Availability
+                </h2>
+                <div className="grid grid-cols-5 gap-4 mb-8">
+                  {stalls.filter(s => !s.isEmpty).map(stall => (
+                    <div key={stall.id} className={`p-4 rounded-xl border-2 text-center text-sm font-semibold transition $${'{'}
+                      stall.pending ? 'bg-orange-500/15 border-orange-500/40 text-orange-300' :
+                      stall.reserved ? 'bg-green-500/15 border-green-500/40 text-green-300' :
+                      'bg-blue-500/10 border-blue-500/30 text-blue-300'
+                    }`}>
+                      <div className="text-lg font-bold text-white">{stall.id}</div>
+                      <div className="text-xs text-gray-400">{stall.size}</div>
+                      {stall.pending && <div className="mt-1 text-xs text-orange-400">Pending</div>}
+                      {stall.reserved && !stall.pending && <div className="mt-1 text-xs text-green-400">Reserved</div>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            {/* Reservations Tab */}
+            {superAdminTab === 'reservations' && (
+              <div>
+                <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+                  <CheckCircle className="w-6 h-6 text-green-400" /> Confirmed Reservations
+                </h2>
+                {reservedStalls.length === 0 ? (
+                  <div className="bg-[#1a1f37]/50 border border-white/10 rounded-xl p-8 text-center text-gray-400">
+                    No confirmed reservations yet.
+                  </div>
+                ) : (
+                  <div className="grid md:grid-cols-3 gap-5">
+                    {reservedStalls.map(stall => (
+                      <div key={stall.id} className="bg-[#1a1f37]/50 border border-green-500/40 rounded-xl p-6">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <div className="text-xl font-bold text-white">{stall.id}</div>
+                            <div className="text-xs text-gray-400">Size: {stall.size}</div>
+                            <div className="mt-2 text-sm text-gray-300 font-semibold">{stall.businessName}</div>
+                            <div className="text-xs text-gray-400">{stall.email}</div>
+                          </div>
+                          <span className="text-xs bg-green-500/30 text-green-300 px-2 py-1 rounded-full font-semibold">Approved</span>
+                        </div>
+                        <div className="text-xs text-gray-400 mt-3">
+                          Approved: {stall.approvedDate ? new Date(stall.approvedDate).toLocaleString() : '—'}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
           </div>
