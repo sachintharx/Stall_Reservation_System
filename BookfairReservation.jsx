@@ -2060,6 +2060,34 @@ const App = () => {
                   <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full"></div>
                 )}
               </button>
+              <button
+                onClick={() => setSuperAdminTab('stallconfig')}
+                className={`px-6 py-3 font-semibold transition-all rounded-t-xl relative ${
+                  superAdminTab === 'stallconfig' ? 'text-white' : 'text-gray-400 hover:text-gray-200'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <Building className="w-5 h-5" />
+                  Stall Configuration
+                </div>
+                {superAdminTab === 'stallconfig' && (
+                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full"></div>
+                )}
+              </button>
+              <button
+                onClick={() => setSuperAdminTab('mapupload')}
+                className={`px-6 py-3 font-semibold transition-all rounded-t-xl relative ${
+                  superAdminTab === 'mapupload' ? 'text-white' : 'text-gray-400 hover:text-gray-200'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <MapPin className="w-5 h-5" />
+                  Map Management
+                </div>
+                {superAdminTab === 'mapupload' && (
+                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full"></div>
+                )}
+              </button>
             </div>
 
             {/* Dashboard Tab - Show regular admin dashboard */}
@@ -2116,6 +2144,301 @@ const App = () => {
                       </div>
                     </div>
                   ))}
+                </div>
+              </div>
+            )}
+
+            {/* Stall Configuration Tab */}
+            {superAdminTab === 'stallconfig' && (
+              <div>
+                <div className="bg-gradient-to-br from-green-500/10 to-blue-600/10 border border-green-500/20 rounded-2xl p-8 mb-6">
+                  <div className="flex items-start gap-4 mb-6">
+                    <div className="bg-gradient-to-br from-green-500 to-blue-600 p-3 rounded-xl">
+                      <Building className="w-6 h-6 text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-xl font-bold text-white mb-2">Configure Stalls</h3>
+                      <p className="text-gray-300 text-sm">Set the number of stalls by size and choose naming pattern. This will generate all stalls for the event.</p>
+                    </div>
+                  </div>
+                  
+                  <div className="grid md:grid-cols-3 gap-6 mb-6">
+                    {/* Small Stalls */}
+                    <div className="bg-[#1a1f37]/50 rounded-xl p-5 border border-white/10">
+                      <label className="block text-sm font-semibold text-gray-300 mb-3">Small Stalls</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={stallConfig.small}
+                        onChange={(e) => setStallConfig({...stallConfig, small: parseInt(e.target.value) || 0})}
+                        className="w-full px-4 py-3 bg-[#0d1229] border border-white/10 rounded-lg text-white focus:outline-none focus:border-green-500 transition"
+                      />
+                      <p className="text-xs text-gray-400 mt-2">Compact spaces for small vendors</p>
+                    </div>
+                    
+                    {/* Medium Stalls */}
+                    <div className="bg-[#1a1f37]/50 rounded-xl p-5 border border-white/10">
+                      <label className="block text-sm font-semibold text-gray-300 mb-3">Medium Stalls</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={stallConfig.medium}
+                        onChange={(e) => setStallConfig({...stallConfig, medium: parseInt(e.target.value) || 0})}
+                        className="w-full px-4 py-3 bg-[#0d1229] border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500 transition"
+                      />
+                      <p className="text-xs text-gray-400 mt-2">Standard size stalls</p>
+                    </div>
+                    
+                    {/* Large Stalls */}
+                    <div className="bg-[#1a1f37]/50 rounded-xl p-5 border border-white/10">
+                      <label className="block text-sm font-semibold text-gray-300 mb-3">Large Stalls</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={stallConfig.large}
+                        onChange={(e) => setStallConfig({...stallConfig, large: parseInt(e.target.value) || 0})}
+                        className="w-full px-4 py-3 bg-[#0d1229] border border-white/10 rounded-lg text-white focus:outline-none focus:border-purple-500 transition"
+                      />
+                      <p className="text-xs text-gray-400 mt-2">Premium large spaces</p>
+                    </div>
+                  </div>
+                  
+                  {/* Stall Name Prefix */}
+                  <div className="bg-[#1a1f37]/50 rounded-xl p-5 border border-white/10 mb-6">
+                    <label className="block text-sm font-semibold text-gray-300 mb-3">Stall Name Prefix (Optional)</label>
+                    <input
+                      type="text"
+                      placeholder="e.g., STALL-, BOOTH-, etc."
+                      value={stallConfig.prefix}
+                      onChange={(e) => setStallConfig({...stallConfig, prefix: e.target.value})}
+                      className="w-full px-4 py-3 bg-[#0d1229] border border-white/10 rounded-lg text-white focus:outline-none focus:border-cyan-500 transition placeholder-gray-500"
+                    />
+                    <p className="text-xs text-gray-400 mt-2">
+                      Leave empty for no prefix, or add text like "STALL-" to create names like STALL-A1, STALL-A2...
+                    </p>
+                  </div>
+                  
+                  {/* Naming Pattern */}
+                  <div className="bg-[#1a1f37]/50 rounded-xl p-5 border border-white/10 mb-6">
+                    <label className="block text-sm font-semibold text-gray-300 mb-3">Stall Naming Pattern</label>
+                    <div className="flex gap-4">
+                      <button
+                        onClick={() => setStallConfig({...stallConfig, namingPattern: 'alphanumeric'})}
+                        className={`flex-1 px-6 py-4 rounded-xl font-semibold transition ${
+                          stallConfig.namingPattern === 'alphanumeric'
+                            ? 'bg-gradient-to-r from-blue-500 to-cyan-600 text-white shadow-lg'
+                            : 'bg-[#0d1229] text-gray-400 border border-white/10 hover:border-blue-500/50'
+                        }`}
+                      >
+                        <div className="text-lg mb-1">{stallConfig.prefix || ''}A1, A2, B1, B2...</div>
+                        <div className="text-xs opacity-75">Alphanumeric (Rows & Columns)</div>
+                      </button>
+                      <button
+                        onClick={() => setStallConfig({...stallConfig, namingPattern: 'numeric'})}
+                        className={`flex-1 px-6 py-4 rounded-xl font-semibold transition ${
+                          stallConfig.namingPattern === 'numeric'
+                            ? 'bg-gradient-to-r from-blue-500 to-cyan-600 text-white shadow-lg'
+                            : 'bg-[#0d1229] text-gray-400 border border-white/10 hover:border-blue-500/50'
+                        }`}
+                      >
+                        <div className="text-lg mb-1">{stallConfig.prefix || ''}1, 2, 3, 4...</div>
+                        <div className="text-xs opacity-75">Simple Numeric</div>
+                      </button>
+                    </div>
+                  </div>
+                  
+                  {/* Summary */}
+                  <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20 rounded-xl p-5 mb-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-white font-bold text-lg mb-1">Total Stalls: {stallConfig.small + stallConfig.medium + stallConfig.large}</p>
+                        <p className="text-gray-300 text-sm">
+                          {stallConfig.small} Small • {stallConfig.medium} Medium • {stallConfig.large} Large
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-blue-400 text-sm font-semibold">Naming: {stallConfig.namingPattern === 'alphanumeric' ? 'A1, A2...' : '1, 2, 3...'}</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <button
+                    onClick={generateStallsFromConfig}
+                    className="w-full py-4 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl font-bold hover:from-indigo-600 hover:to-purple-700 transition transform hover:scale-105 shadow-lg flex items-center justify-center gap-2"
+                  >
+                    <CheckCircle className="w-5 h-5" />
+                    Generate Stalls
+                  </button>
+                  
+                  <p className="text-xs text-gray-400 text-center mt-4">
+                    ⚠️ This will replace existing stall configuration. Make sure to position stalls on the map after generation.
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Map Management Tab */}
+            {superAdminTab === 'mapupload' && (
+              <div>
+                <div className="bg-gradient-to-br from-purple-500/10 to-indigo-600/10 border border-purple-500/20 rounded-2xl p-8 mb-6">
+                  <div className="flex items-start gap-4 mb-6">
+                    <div className="bg-gradient-to-br from-purple-500 to-indigo-600 p-3 rounded-xl">
+                      <MapPin className="w-6 h-6 text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-xl font-bold text-white mb-2">Upload Trade Hall Floor Plan</h3>
+                      <p className="text-gray-300 text-sm">Upload the Trade Hall floor plan image. Stall positions (A1-E10) are pre-configured to match the layout. Vendors will see clickable markers on each stall location.</p>
+                      <div className="mt-2 bg-blue-500/10 border border-blue-400/20 rounded-lg p-3">
+                        <p className="text-blue-300 text-xs">💡 Tip: The system already knows where stalls A1-A10, B1-B10, C1-C10, D1-D10, and E1-E10 are located on the map.</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    <label className="block">
+                      <div className="border-2 border-dashed border-purple-500/30 rounded-xl p-8 text-center hover:border-purple-500/50 transition cursor-pointer bg-[#1a1f37]/30">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleImageUpload}
+                          className="hidden"
+                          id="super-map-upload"
+                        />
+                        <label htmlFor="super-map-upload" className="cursor-pointer">
+                          <div className="flex flex-col items-center gap-3">
+                            <div className="bg-gradient-to-br from-purple-500 to-indigo-600 p-4 rounded-full">
+                              <Building className="w-8 h-8 text-white" />
+                            </div>
+                            <div>
+                              <p className="text-white font-semibold mb-1">Click to upload map image</p>
+                              <p className="text-gray-400 text-sm">PNG, JPG, or SVG (Max 10MB)</p>
+                            </div>
+                          </div>
+                        </label>
+                      </div>
+                    </label>
+                    
+                    {stallMapImage && (
+                      <div className="bg-[#1a1f37]/50 rounded-xl p-4 border border-white/10">
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center gap-2">
+                            <CheckCircle className="w-5 h-5 text-green-400" />
+                            <span className="text-white font-semibold">Map Uploaded Successfully</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="bg-green-500/20 px-3 py-1 rounded-full">
+                              <span className="text-green-300 text-xs font-semibold">💾 Saved to localStorage</span>
+                            </div>
+                            <button
+                              onClick={() => setIsPositioningMode(!isPositioningMode)}
+                              className={`px-4 py-2 rounded-lg font-semibold text-sm transition flex items-center gap-2 ${
+                                isPositioningMode
+                                  ? 'bg-gradient-to-r from-orange-500 to-red-600 text-white shadow-lg shadow-orange-500/30'
+                                  : 'bg-gradient-to-r from-blue-500 to-cyan-600 text-white hover:from-blue-600 hover:to-cyan-700'
+                              }`}
+                            >
+                              <MapPin className="w-4 h-4" />
+                              {isPositioningMode ? 'Exit Positioning' : 'Position Stalls'}
+                            </button>
+                            <button
+                              onClick={() => setStallMapImage(null)}
+                              className="text-red-400 hover:text-red-300 transition"
+                            >
+                              <X className="w-5 h-5" />
+                            </button>
+                          </div>
+                        </div>
+                        
+                        {isPositioningMode && (
+                          <div className="bg-orange-500/20 border border-orange-500/40 rounded-lg p-3 mb-4">
+                            <div className="flex items-start gap-2">
+                              <MapPin className="w-5 h-5 text-orange-400 flex-shrink-0 mt-0.5" />
+                              <div>
+                                <p className="text-sm text-white font-semibold mb-1">Positioning Mode Active</p>
+                                <p className="text-xs text-gray-300 mb-2">Click on a stall below, then click on the map where it should appear. Positions are automatically saved for vendors to see.</p>
+                              </div>
+                            </div>
+                            
+                            {/* Stall selector */}
+                            <div className="mt-3 grid grid-cols-10 gap-2">
+                              {stalls.filter(s => !s.isEmpty).map(stall => (
+                                <button
+                                  key={stall.id}
+                                  onClick={() => setHoveredStall(stall.id)}
+                                  className={`px-2 py-2 rounded text-xs font-bold transition flex flex-col items-center justify-center ${
+                                    hoveredStall === stall.id
+                                      ? 'bg-orange-500 text-white ring-2 ring-orange-400'
+                                      : 'bg-[#2a2f4a] text-gray-300 hover:bg-[#3a3f5a]'
+                                  }`}
+                                >
+                                  <span className="text-[10px] leading-none">{stall.id}</span>
+                                  <span className="text-[8px] opacity-75 leading-none mt-0.5">{stall.size[0]}</span>
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        
+                        <div className="relative" onClick={handleMapClick}>
+                          <img 
+                            src={stallMapImage} 
+                            alt="Stall Map Preview" 
+                            className="w-full h-auto rounded-lg" 
+                            style={{ cursor: isPositioningMode ? 'crosshair' : 'default' }}
+                          />
+                          
+                          {/* Show all positioned stalls */}
+                          {stalls.map((stall) => {
+                            if (!stall.mapPosition || stall.isEmpty) return null;
+                            const isActive = hoveredStall === stall.id;
+                            
+                            return (
+                              <div
+                                key={stall.id}
+                                className="absolute transform -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+                                style={{
+                                  left: `${stall.mapPosition.x}%`,
+                                  top: `${stall.mapPosition.y}%`
+                                }}
+                              >
+                                <div className={`w-10 h-10 rounded-full flex flex-col items-center justify-center text-xs font-bold transition-all ${
+                                  isActive
+                                    ? 'bg-orange-500 text-white ring-4 ring-orange-400/50 scale-125'
+                                    : 'bg-blue-500 text-white opacity-70'
+                                }`}>
+                                  <span className="text-[10px] leading-none">{stall.id}</span>
+                                  <span className="text-[8px] opacity-75 leading-none mt-0.5">{stall.size[0]}</span>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                        
+                        <div className="flex items-center justify-between mt-3">
+                          <p className="text-xs text-gray-400">Vendors can now select stalls by clicking on this map</p>
+                          <div className="flex items-center gap-4">
+                            <p className="text-xs text-green-400 font-semibold">{stalls.filter(s => s.mapPosition && !s.isEmpty).length} stalls positioned</p>
+                            <p className="text-xs text-blue-400 font-semibold">✓ Visible to all vendors</p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                
+                <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4">
+                  <div className="flex items-start gap-3">
+                    <div className="text-blue-400 mt-1">ℹ️</div>
+                    <div className="text-sm text-gray-300">
+                      <p className="font-semibold text-white mb-1">How it works:</p>
+                      <ul className="list-disc list-inside space-y-1 text-xs">
+                        <li>Upload a clear floor plan or map showing all stall locations</li>
+                        <li>Vendors will see a toggle to switch between Grid View and Map View</li>
+                        <li>They can click directly on stalls in the map to select them</li>
+                        <li>Selected stalls will be highlighted in pink, reserved in gray, and available in green</li>
+                      </ul>
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
@@ -2355,38 +2678,6 @@ const App = () => {
                   <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-pink-500 to-purple-600 rounded-full"></div>
                 )}
               </button>
-              <button
-                onClick={() => setAdminTab('stallconfig')}
-                className={`px-6 py-3 font-semibold transition-all rounded-t-xl relative ${
-                  adminTab === 'stallconfig'
-                    ? 'text-white'
-                    : 'text-gray-400 hover:text-gray-200'
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  <Building className="w-5 h-5" />
-                  Stall Configuration
-                </div>
-                {adminTab === 'stallconfig' && (
-                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-pink-500 to-purple-600 rounded-full"></div>
-                )}
-              </button>
-              <button
-                onClick={() => setAdminTab('mapupload')}
-                className={`px-6 py-3 font-semibold transition-all rounded-t-xl relative ${
-                  adminTab === 'mapupload'
-                    ? 'text-white'
-                    : 'text-gray-400 hover:text-gray-200'
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  <MapPin className="w-5 h-5" />
-                  Map Management
-                </div>
-                {adminTab === 'mapupload' && (
-                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-pink-500 to-purple-600 rounded-full"></div>
-                )}
-              </button>
             </div>
             
             {adminTab === 'availability' && (
@@ -2486,299 +2777,6 @@ const App = () => {
                       <p className="text-gray-400">No reservations yet</p>
                     </div>
                   )}
-                </div>
-              </div>
-            )}
-            
-            {adminTab === 'stallconfig' && (
-              <div>
-                <div className="bg-gradient-to-br from-indigo-500/10 to-purple-600/10 border border-indigo-500/20 rounded-2xl p-8 mb-6">
-                  <div className="flex items-start gap-4 mb-6">
-                    <div className="bg-gradient-to-br from-indigo-500 to-purple-600 p-3 rounded-xl">
-                      <Building className="w-6 h-6 text-white" />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="text-xl font-bold text-white mb-2">Configure Stalls</h3>
-                      <p className="text-gray-300 text-sm">Set the number of stalls by size and choose naming pattern. This will generate all stalls for the event.</p>
-                    </div>
-                  </div>
-                  
-                  <div className="grid md:grid-cols-3 gap-6 mb-6">
-                    {/* Small Stalls */}
-                    <div className="bg-[#1a1f37]/50 rounded-xl p-5 border border-white/10">
-                      <label className="block text-sm font-semibold text-gray-300 mb-3">Small Stalls</label>
-                      <input
-                        type="number"
-                        min="0"
-                        value={stallConfig.small}
-                        onChange={(e) => setStallConfig({...stallConfig, small: parseInt(e.target.value) || 0})}
-                        className="w-full px-4 py-3 bg-[#0d1229] border border-white/10 rounded-lg text-white focus:outline-none focus:border-green-500 transition"
-                      />
-                      <p className="text-xs text-gray-400 mt-2">Compact spaces for small vendors</p>
-                    </div>
-                    
-                    {/* Medium Stalls */}
-                    <div className="bg-[#1a1f37]/50 rounded-xl p-5 border border-white/10">
-                      <label className="block text-sm font-semibold text-gray-300 mb-3">Medium Stalls</label>
-                      <input
-                        type="number"
-                        min="0"
-                        value={stallConfig.medium}
-                        onChange={(e) => setStallConfig({...stallConfig, medium: parseInt(e.target.value) || 0})}
-                        className="w-full px-4 py-3 bg-[#0d1229] border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500 transition"
-                      />
-                      <p className="text-xs text-gray-400 mt-2">Standard size stalls</p>
-                    </div>
-                    
-                    {/* Large Stalls */}
-                    <div className="bg-[#1a1f37]/50 rounded-xl p-5 border border-white/10">
-                      <label className="block text-sm font-semibold text-gray-300 mb-3">Large Stalls</label>
-                      <input
-                        type="number"
-                        min="0"
-                        value={stallConfig.large}
-                        onChange={(e) => setStallConfig({...stallConfig, large: parseInt(e.target.value) || 0})}
-                        className="w-full px-4 py-3 bg-[#0d1229] border border-white/10 rounded-lg text-white focus:outline-none focus:border-purple-500 transition"
-                      />
-                      <p className="text-xs text-gray-400 mt-2">Premium large spaces</p>
-                    </div>
-                  </div>
-                  
-                  {/* Stall Name Prefix */}
-                  <div className="bg-[#1a1f37]/50 rounded-xl p-5 border border-white/10 mb-6">
-                    <label className="block text-sm font-semibold text-gray-300 mb-3">Stall Name Prefix (Optional)</label>
-                    <input
-                      type="text"
-                      placeholder="e.g., STALL-, BOOTH-, etc."
-                      value={stallConfig.prefix}
-                      onChange={(e) => setStallConfig({...stallConfig, prefix: e.target.value})}
-                      className="w-full px-4 py-3 bg-[#0d1229] border border-white/10 rounded-lg text-white focus:outline-none focus:border-cyan-500 transition placeholder-gray-500"
-                    />
-                    <p className="text-xs text-gray-400 mt-2">
-                      Leave empty for no prefix, or add text like "STALL-" to create names like STALL-A1, STALL-A2...
-                    </p>
-                  </div>
-                  
-                  {/* Naming Pattern */}
-                  <div className="bg-[#1a1f37]/50 rounded-xl p-5 border border-white/10 mb-6">
-                    <label className="block text-sm font-semibold text-gray-300 mb-3">Stall Naming Pattern</label>
-                    <div className="flex gap-4">
-                      <button
-                        onClick={() => setStallConfig({...stallConfig, namingPattern: 'alphanumeric'})}
-                        className={`flex-1 px-6 py-4 rounded-xl font-semibold transition ${
-                          stallConfig.namingPattern === 'alphanumeric'
-                            ? 'bg-gradient-to-r from-blue-500 to-cyan-600 text-white shadow-lg'
-                            : 'bg-[#0d1229] text-gray-400 border border-white/10 hover:border-blue-500/50'
-                        }`}
-                      >
-                        <div className="text-lg mb-1">{stallConfig.prefix || ''}A1, A2, B1, B2...</div>
-                        <div className="text-xs opacity-75">Alphanumeric (Rows & Columns)</div>
-                      </button>
-                      <button
-                        onClick={() => setStallConfig({...stallConfig, namingPattern: 'numeric'})}
-                        className={`flex-1 px-6 py-4 rounded-xl font-semibold transition ${
-                          stallConfig.namingPattern === 'numeric'
-                            ? 'bg-gradient-to-r from-blue-500 to-cyan-600 text-white shadow-lg'
-                            : 'bg-[#0d1229] text-gray-400 border border-white/10 hover:border-blue-500/50'
-                        }`}
-                      >
-                        <div className="text-lg mb-1">{stallConfig.prefix || ''}1, 2, 3, 4...</div>
-                        <div className="text-xs opacity-75">Simple Numeric</div>
-                      </button>
-                    </div>
-                  </div>
-                  
-                  {/* Summary */}
-                  <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20 rounded-xl p-5 mb-6">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-white font-bold text-lg mb-1">Total Stalls: {stallConfig.small + stallConfig.medium + stallConfig.large}</p>
-                        <p className="text-gray-300 text-sm">
-                          {stallConfig.small} Small • {stallConfig.medium} Medium • {stallConfig.large} Large
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-blue-400 text-sm font-semibold">Naming: {stallConfig.namingPattern === 'alphanumeric' ? 'A1, A2...' : '1, 2, 3...'}</p>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <button
-                    onClick={generateStallsFromConfig}
-                    className="w-full py-4 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl font-bold hover:from-indigo-600 hover:to-purple-700 transition transform hover:scale-105 shadow-lg flex items-center justify-center gap-2"
-                  >
-                    <CheckCircle className="w-5 h-5" />
-                    Generate Stalls
-                  </button>
-                  
-                  <p className="text-xs text-gray-400 text-center mt-4">
-                    ⚠️ This will replace existing stall configuration. Make sure to position stalls on the map after generation.
-                  </p>
-                </div>
-              </div>
-            )}
-            
-            {adminTab === 'mapupload' && (
-              <div>
-                <div className="bg-gradient-to-br from-purple-500/10 to-indigo-600/10 border border-purple-500/20 rounded-2xl p-8 mb-6">
-                  <div className="flex items-start gap-4 mb-6">
-                    <div className="bg-gradient-to-br from-purple-500 to-indigo-600 p-3 rounded-xl">
-                      <MapPin className="w-6 h-6 text-white" />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="text-xl font-bold text-white mb-2">Upload Trade Hall Floor Plan</h3>
-                      <p className="text-gray-300 text-sm">Upload the Trade Hall floor plan image. Stall positions (A1-E10) are pre-configured to match the layout. Vendors will see clickable markers on each stall location.</p>
-                      <div className="mt-2 bg-blue-500/10 border border-blue-400/20 rounded-lg p-3">
-                        <p className="text-blue-300 text-xs">💡 Tip: The system already knows where stalls A1-A10, B1-B10, C1-C10, D1-D10, and E1-E10 are located on the map.</p>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-4">
-                    <label className="block">
-                      <div className="border-2 border-dashed border-purple-500/30 rounded-xl p-8 text-center hover:border-purple-500/50 transition cursor-pointer bg-[#1a1f37]/30">
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={handleImageUpload}
-                          className="hidden"
-                          id="map-upload"
-                        />
-                        <label htmlFor="map-upload" className="cursor-pointer">
-                          <div className="flex flex-col items-center gap-3">
-                            <div className="bg-gradient-to-br from-purple-500 to-indigo-600 p-4 rounded-full">
-                              <Building className="w-8 h-8 text-white" />
-                            </div>
-                            <div>
-                              <p className="text-white font-semibold mb-1">Click to upload map image</p>
-                              <p className="text-gray-400 text-sm">PNG, JPG, or SVG (Max 10MB)</p>
-                            </div>
-                          </div>
-                        </label>
-                      </div>
-                    </label>
-                    
-                    {stallMapImage && (
-                      <div className="bg-[#1a1f37]/50 rounded-xl p-4 border border-white/10">
-                        <div className="flex items-center justify-between mb-3">
-                          <div className="flex items-center gap-2">
-                            <CheckCircle className="w-5 h-5 text-green-400" />
-                            <span className="text-white font-semibold">Map Uploaded Successfully</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <div className="bg-green-500/20 px-3 py-1 rounded-full">
-                              <span className="text-green-300 text-xs font-semibold">💾 Saved to localStorage</span>
-                            </div>
-                            <button
-                              onClick={() => setIsPositioningMode(!isPositioningMode)}
-                              className={`px-4 py-2 rounded-lg font-semibold text-sm transition flex items-center gap-2 ${
-                                isPositioningMode
-                                  ? 'bg-gradient-to-r from-orange-500 to-red-600 text-white shadow-lg shadow-orange-500/30'
-                                  : 'bg-gradient-to-r from-blue-500 to-cyan-600 text-white hover:from-blue-600 hover:to-cyan-700'
-                              }`}
-                            >
-                              <MapPin className="w-4 h-4" />
-                              {isPositioningMode ? 'Exit Positioning' : 'Position Stalls'}
-                            </button>
-                            <button
-                              onClick={() => setStallMapImage(null)}
-                              className="text-red-400 hover:text-red-300 transition"
-                            >
-                              <X className="w-5 h-5" />
-                            </button>
-                          </div>
-                        </div>
-                        
-                        {isPositioningMode && (
-                          <div className="bg-orange-500/20 border border-orange-500/40 rounded-lg p-3 mb-4">
-                            <div className="flex items-start gap-2">
-                              <MapPin className="w-5 h-5 text-orange-400 flex-shrink-0 mt-0.5" />
-                              <div>
-                                <p className="text-sm text-white font-semibold mb-1">Positioning Mode Active</p>
-                                <p className="text-xs text-gray-300 mb-2">Click on a stall below, then click on the map where it should appear. Positions are automatically saved for vendors to see.</p>
-                              </div>
-                            </div>
-                            
-                            {/* Stall selector */}
-                            <div className="mt-3 grid grid-cols-10 gap-2">
-                              {stalls.filter(s => !s.isEmpty).map(stall => (
-                                <button
-                                  key={stall.id}
-                                  onClick={() => setHoveredStall(stall.id)}
-                                  className={`px-2 py-2 rounded text-xs font-bold transition flex flex-col items-center justify-center ${
-                                    hoveredStall === stall.id
-                                      ? 'bg-orange-500 text-white ring-2 ring-orange-400'
-                                      : 'bg-[#2a2f4a] text-gray-300 hover:bg-[#3a3f5a]'
-                                  }`}
-                                >
-                                  <span className="text-[10px] leading-none">{stall.id}</span>
-                                  <span className="text-[8px] opacity-75 leading-none mt-0.5">{stall.size[0]}</span>
-                                </button>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                        
-                        <div className="relative" onClick={handleMapClick}>
-                          <img 
-                            src={stallMapImage} 
-                            alt="Stall Map Preview" 
-                            className="w-full h-auto rounded-lg" 
-                            style={{ cursor: isPositioningMode ? 'crosshair' : 'default' }}
-                          />
-                          
-                          {/* Show all positioned stalls */}
-                          {stalls.map((stall) => {
-                            if (!stall.mapPosition || stall.isEmpty) return null;
-                            const isActive = hoveredStall === stall.id;
-                            
-                            return (
-                              <div
-                                key={stall.id}
-                                className="absolute transform -translate-x-1/2 -translate-y-1/2 pointer-events-none"
-                                style={{
-                                  left: `${stall.mapPosition.x}%`,
-                                  top: `${stall.mapPosition.y}%`
-                                }}
-                              >
-                                <div className={`w-10 h-10 rounded-full flex flex-col items-center justify-center text-xs font-bold transition-all ${
-                                  isActive
-                                    ? 'bg-orange-500 text-white ring-4 ring-orange-400/50 scale-125'
-                                    : 'bg-blue-500 text-white opacity-70'
-                                }`}>
-                                  <span className="text-[10px] leading-none">{stall.id}</span>
-                                  <span className="text-[8px] opacity-75 leading-none mt-0.5">{stall.size[0]}</span>
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                        
-                        <div className="flex items-center justify-between mt-3">
-                          <p className="text-xs text-gray-400">Vendors can now select stalls by clicking on this map</p>
-                          <div className="flex items-center gap-4">
-                            <p className="text-xs text-green-400 font-semibold">{stalls.filter(s => s.mapPosition && !s.isEmpty).length} stalls positioned</p>
-                            <p className="text-xs text-blue-400 font-semibold">✓ Visible to all vendors</p>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-                
-                <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4">
-                  <div className="flex items-start gap-3">
-                    <div className="text-blue-400 mt-1">ℹ️</div>
-                    <div className="text-sm text-gray-300">
-                      <p className="font-semibold text-white mb-1">How it works:</p>
-                      <ul className="list-disc list-inside space-y-1 text-xs">
-                        <li>Upload a clear floor plan or map showing all stall locations</li>
-                        <li>Vendors will see a toggle to switch between Grid View and Map View</li>
-                        <li>They can click directly on stalls in the map to select them</li>
-                        <li>Selected stalls will be highlighted in pink, reserved in gray, and available in green</li>
-                      </ul>
-                    </div>
-                  </div>
                 </div>
               </div>
             )}
