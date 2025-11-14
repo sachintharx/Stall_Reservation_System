@@ -57,10 +57,11 @@ const generateInitialStalls = () => {
 };
 
 const App = () => {
-  // Check if we're on the admin route
+  // Check if we're on the admin or super admin route
   const isAdminRoute = window.location.pathname === '/admin' || window.location.pathname === '/admin/';
+  const isSuperAdminRoute = window.location.pathname === '/adminx' || window.location.pathname === '/adminx/';
   
-  const [currentView, setCurrentView] = useState(isAdminRoute ? 'admin_landing' : 'landing');
+  const [currentView, setCurrentView] = useState(isSuperAdminRoute ? 'superadmin_landing' : isAdminRoute ? 'admin_landing' : 'landing');
   const [stalls, setStalls] = useState(() => {
     const savedStalls = localStorage.getItem('tradeHallStalls');
     return savedStalls ? JSON.parse(savedStalls) : generateInitialStalls();
@@ -128,11 +129,27 @@ const App = () => {
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
   
-  // Predefined admin credentials
-  const adminCredentials = [
-    { email: 'admin@bookfair.com', password: 'admin123', name: 'Admin User' },
-    { email: 'employee@bookfair.com', password: 'employee123', name: 'Employee User' }
+  // Admin management state
+  const [adminList, setAdminList] = useState(() => {
+    const savedAdmins = localStorage.getItem('bookfairAdmins');
+    return savedAdmins ? JSON.parse(savedAdmins) : [
+      { id: 1, email: 'admin@bookfair.com', password: 'admin123', name: 'Admin User', role: 'admin' },
+      { id: 2, email: 'employee@bookfair.com', password: 'employee123', name: 'Employee User', role: 'admin' }
+    ];
+  });
+  
+  // Super admin credentials (hardcoded, cannot be modified)
+  const superAdminCredentials = [
+    { email: 'superadmin@bookfair.com', password: 'super123', name: 'Super Admin', role: 'superadmin' }
   ];
+  
+  // Save admin list to localStorage
+  useEffect(() => {
+    localStorage.setItem('bookfairAdmins', JSON.stringify(adminList));
+  }, [adminList]);
+  
+  // Combined credentials for admin login
+  const adminCredentials = adminList;
 
   useEffect(() => {
     setFadeIn(false);
@@ -319,6 +336,33 @@ const App = () => {
       const updatedStalls = stalls.filter(stall => stall.id !== stallId);
       setStalls(updatedStalls);
       alert(`🗑️ Stall ${stallId} has been deleted successfully!`);
+    }
+  };
+  
+  // Admin management functions
+  const addAdmin = (adminData) => {
+    const newAdmin = {
+      id: Date.now(),
+      ...adminData,
+      role: 'admin'
+    };
+    setAdminList([...adminList, newAdmin]);
+    alert(`✅ Admin ${adminData.name} added successfully!`);
+  };
+  
+  const editAdmin = (adminId, updatedData) => {
+    const updatedAdmins = adminList.map(admin => 
+      admin.id === adminId ? { ...admin, ...updatedData } : admin
+    );
+    setAdminList(updatedAdmins);
+    alert(`✅ Admin updated successfully!`);
+  };
+  
+  const deleteAdmin = (adminId) => {
+    if (window.confirm('Are you sure you want to delete this admin?\n\nThis action cannot be undone.')) {
+      const updatedAdmins = adminList.filter(admin => admin.id !== adminId);
+      setAdminList(updatedAdmins);
+      alert(`🗑️ Admin deleted successfully!`);
     }
   };
   
@@ -1254,14 +1298,15 @@ const App = () => {
                           }}
                         >
                           {/* Stall Marker */}
-                          <div className={`w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 ${
+                          <div className={`w-12 h-12 rounded-full flex flex-col items-center justify-center text-xs font-bold transition-all duration-300 ${
                             isSelected
                               ? 'bg-gradient-to-br from-pink-500 to-purple-600 text-white ring-4 ring-pink-400/50 scale-125 shadow-lg shadow-pink-500/50 z-30'
                               : isReserved
                               ? 'bg-gradient-to-br from-gray-600 to-gray-700 text-gray-400 opacity-60 cursor-not-allowed z-10'
                               : 'bg-gradient-to-br from-green-400 to-emerald-500 text-white hover:scale-125 cursor-pointer hover:shadow-xl hover:shadow-green-500/50 hover:z-20 z-10'
                           }`}>
-                            {stall.id}
+                            <span className="text-[11px] leading-none">{stall.id}</span>
+                            <span className="text-[9px] opacity-75 leading-none mt-0.5">{stall.size[0]}</span>
                           </div>
                           
                           {/* Tooltip on hover */}
@@ -1754,6 +1799,444 @@ const App = () => {
   );
 };
 
+  // Super Admin Landing Page
+  const SuperAdminLandingPage = () => (
+    <div className={`min-h-screen bg-gradient-to-br from-[#1a1f37] via-[#4a1b2d] to-[#1a1f37] flex items-center justify-center p-8 transition-opacity duration-500 ${fadeIn ? 'opacity-100' : 'opacity-0'} relative overflow-hidden`}>
+      {/* Animated Background Orbs */}
+      <div className="background-orbs">
+        <div className="orb orb-1"></div>
+        <div className="orb orb-3"></div>
+      </div>
+      
+      <div className="max-w-4xl w-full relative z-10">
+        <div className="text-center mb-12">
+          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-500/20 to-pink-600/20 border border-purple-500/30 px-4 py-2 rounded-full mb-6">
+            <Award className="w-4 h-4 text-purple-400" />
+            <span className="text-purple-300 text-sm font-semibold">Super Admin Access</span>
+          </div>
+          <h1 className="text-6xl font-bold text-white mb-4 bg-gradient-to-r from-purple-400 via-pink-400 to-red-400 bg-clip-text text-transparent flex items-center justify-center gap-4">
+            <Target className="w-16 h-16 text-purple-400" />
+            Super Admin Portal
+          </h1>
+          <p className="text-xl text-gray-300 mb-8">Master Control & Admin Management</p>
+        </div>
+        
+        <button
+          onClick={() => setCurrentView('superadmin_login')}
+          className="group relative bg-gradient-to-br from-[#2a2f4a]/80 to-[#1e2337]/80 backdrop-blur-xl p-10 rounded-3xl border border-white/10 shadow-2xl hover:shadow-purple-500/30 transform hover:scale-105 transition-all duration-300 hover:border-purple-500/40 w-full"
+        >
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-pink-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          
+          <div className="relative flex flex-col items-center space-y-6">
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full blur-2xl opacity-50 group-hover:opacity-75 transition-opacity"></div>
+              <div className="relative bg-gradient-to-br from-purple-500 to-pink-600 p-8 rounded-full group-hover:scale-110 transition-transform shadow-lg">
+                <Award className="w-16 h-16 text-white" />
+              </div>
+            </div>
+            
+            <div>
+              <h2 className="text-4xl font-bold text-white mb-3">Super Admin Login</h2>
+              <p className="text-gray-300 text-center mb-6 text-lg">Full system control & admin management</p>
+            </div>
+            
+            <div className="flex flex-wrap gap-3 justify-center">
+              <span className="bg-purple-500/20 border border-purple-500/30 text-purple-300 px-4 py-2 rounded-full text-sm font-semibold flex items-center gap-2">
+                <Users className="w-4 h-4" />
+                Manage Admins
+              </span>
+              <span className="bg-pink-500/20 border border-pink-500/30 text-pink-300 px-4 py-2 rounded-full text-sm font-semibold flex items-center gap-2">
+                <Building className="w-4 h-4" />
+                Full Dashboard Access
+              </span>
+            </div>
+            
+            <div className="mt-6 text-purple-400 group-hover:translate-x-2 transition-transform flex items-center gap-2">
+              <span className="text-lg font-semibold">Access Super Admin</span>
+              <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </div>
+          </div>
+        </button>
+        
+        <button
+          onClick={() => window.location.href = '/'}
+          className="mt-6 text-purple-400 hover:text-purple-300 flex items-center gap-2 transition-colors mx-auto"
+        >
+          <Home className="w-4 h-4" /> Go to Vendor Portal
+        </button>
+      </div>
+    </div>
+  );
+
+  // Super Admin Login
+  const SuperAdminLogin = () => {
+    const [formData, setFormData] = useState({ email: '', password: '' });
+    const [error, setError] = useState('');
+
+    const handleSubmit = (e) => {
+      e.preventDefault();
+      setError('');
+      
+      // Accept any credentials for easy testing
+      if (formData.email && formData.password) {
+        setCurrentView('superadmin_dashboard');
+      } else {
+        setError('Please enter email and password.');
+      }
+    };
+
+    return (
+      <div className={`min-h-screen bg-gradient-to-br from-[#1a1f37] via-[#4a1b2d] to-[#1a1f37] flex items-center justify-center p-8 transition-opacity duration-500 ${fadeIn ? 'opacity-100' : 'opacity-0'} relative overflow-hidden`}>
+        <div className="background-orbs">
+          <div className="orb orb-1"></div>
+          <div className="orb orb-3"></div>
+        </div>
+        
+        <div className="max-w-md w-full relative z-10">
+          <button
+            onClick={() => setCurrentView('superadmin_landing')}
+            className="mb-4 text-purple-400 hover:text-purple-300 flex items-center gap-2 transition-colors group"
+          >
+            <Home className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> Back
+          </button>
+          
+          <div className="bg-gradient-to-br from-[#2a2f4a]/80 to-[#1e2337]/80 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl p-8">
+            <div className="text-center mb-8">
+              <div className="bg-gradient-to-br from-purple-500 to-pink-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                <Award className="w-8 h-8 text-white" />
+              </div>
+              <h2 className="text-3xl font-bold text-white">Super Admin Login</h2>
+              <p className="text-gray-300 mt-2">Master control access</p>
+            </div>
+            
+            {error && (
+              <div className="mb-4 bg-red-500/20 border border-red-500/50 text-red-300 px-4 py-3 rounded-xl text-sm flex items-center gap-2">
+                <X className="w-4 h-4" />
+                {error}
+              </div>
+            )}
+            
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div>
+                <label className="block text-sm font-semibold text-gray-300 mb-2">Email</label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => setFormData({...formData, email: e.target.value})}
+                    className="w-full pl-12 pr-4 py-3 bg-[#0d1229] border border-white/10 rounded-xl text-white focus:outline-none focus:border-purple-500 transition"
+                    required
+                  />
+                </div>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-semibold text-gray-300 mb-2">Password</label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type="password"
+                    value={formData.password}
+                    onChange={(e) => setFormData({...formData, password: e.target.value})}
+                    className="w-full pl-12 pr-4 py-3 bg-[#0d1229] border border-white/10 rounded-xl text-white focus:outline-none focus:border-purple-500 transition"
+                    required
+                  />
+                </div>
+              </div>
+              
+              <button
+                type="submit"
+                className="w-full py-3 bg-gradient-to-r from-purple-500 to-pink-600 text-white rounded-xl font-bold hover:from-purple-600 hover:to-pink-700 transition transform hover:scale-105 shadow-lg shadow-purple-500/50 flex items-center justify-center gap-2"
+              >
+                <Award className="w-5 h-5" />
+                Access Super Admin
+              </button>
+            </form>
+            
+            <div className="mt-6 pt-6 border-t border-white/10">
+              <p className="text-xs text-gray-300 text-center mb-2 font-semibold">Demo Credentials:</p>
+              <p className="text-xs text-gray-400 text-center">superadmin@bookfair.com / super123</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Super Admin Dashboard
+  const SuperAdminDashboard = () => {
+    const [superAdminTab, setSuperAdminTab] = useState('dashboard');
+    const [showAddAdminModal, setShowAddAdminModal] = useState(false);
+    const [showEditAdminModal, setShowEditAdminModal] = useState(false);
+    const [editingAdmin, setEditingAdmin] = useState(null);
+    const [newAdminData, setNewAdminData] = useState({ name: '', email: '', password: '' });
+
+    const handleAddAdmin = () => {
+      if (newAdminData.name && newAdminData.email && newAdminData.password) {
+        addAdmin(newAdminData);
+        setNewAdminData({ name: '', email: '', password: '' });
+        setShowAddAdminModal(false);
+      }
+    };
+
+    const handleEditAdmin = () => {
+      if (editingAdmin && newAdminData.name && newAdminData.email) {
+        editAdmin(editingAdmin.id, newAdminData);
+        setEditingAdmin(null);
+        setNewAdminData({ name: '', email: '', password: '' });
+        setShowEditAdminModal(false);
+      }
+    };
+
+    const openEditModal = (admin) => {
+      setEditingAdmin(admin);
+      setNewAdminData({ name: admin.name, email: admin.email, password: '' });
+      setShowEditAdminModal(true);
+    };
+
+    return (
+      <div className={`min-h-screen bg-gradient-to-br from-[#1a1f37] via-[#4a1b2d] to-[#1a1f37] p-8 transition-opacity duration-500 ${fadeIn ? 'opacity-100' : 'opacity-0'} relative overflow-hidden`}>
+        <div className="background-orbs">
+          <div className="orb orb-1"></div>
+          <div className="orb orb-3"></div>
+        </div>
+        
+        <div className="max-w-7xl mx-auto relative z-10">
+          {/* Header */}
+          <div className="flex justify-between items-center mb-8">
+            <div>
+              <h1 className="text-4xl font-bold text-white mb-2 flex items-center gap-3">
+                <Award className="w-10 h-10 text-purple-400" />
+                Super Admin Dashboard
+              </h1>
+              <p className="text-gray-300">Master control & admin management</p>
+            </div>
+            <button
+              onClick={() => {
+                if (isSuperAdminRoute) {
+                  window.location.href = '/';
+                } else {
+                  setCurrentView('superadmin_landing');
+                }
+              }}
+              className="px-6 py-3 bg-gradient-to-r from-red-500 to-pink-600 text-white rounded-xl font-bold hover:from-red-600 hover:to-pink-700 transition shadow-lg flex items-center gap-2"
+            >
+              <LogOut className="w-5 h-5" />
+              Logout
+            </button>
+          </div>
+
+          {/* Tabs */}
+          <div className="bg-gradient-to-br from-[#2a2f4a]/80 to-[#1e2337]/80 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl p-8">
+            <div className="flex gap-4 mb-6 border-b border-white/10">
+              <button
+                onClick={() => setSuperAdminTab('dashboard')}
+                className={`px-6 py-3 font-semibold transition-all rounded-t-xl relative ${
+                  superAdminTab === 'dashboard' ? 'text-white' : 'text-gray-400 hover:text-gray-200'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <LayoutDashboard className="w-5 h-5" />
+                  Admin Dashboard
+                </div>
+                {superAdminTab === 'dashboard' && (
+                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full"></div>
+                )}
+              </button>
+              <button
+                onClick={() => setSuperAdminTab('admins')}
+                className={`px-6 py-3 font-semibold transition-all rounded-t-xl relative ${
+                  superAdminTab === 'admins' ? 'text-white' : 'text-gray-400 hover:text-gray-200'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <Users className="w-5 h-5" />
+                  Manage Admins
+                </div>
+                {superAdminTab === 'admins' && (
+                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full"></div>
+                )}
+              </button>
+            </div>
+
+            {/* Dashboard Tab - Show regular admin dashboard */}
+            {superAdminTab === 'dashboard' && (
+              <div>
+                <AdminDashboard />
+              </div>
+            )}
+
+            {/* Manage Admins Tab */}
+            {superAdminTab === 'admins' && (
+              <div>
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-2xl font-bold text-white">Admin Accounts</h2>
+                  <button
+                    onClick={() => setShowAddAdminModal(true)}
+                    className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-600 text-white rounded-xl font-semibold hover:from-purple-600 hover:to-pink-700 transition flex items-center gap-2"
+                  >
+                    <Plus className="w-5 h-5" />
+                    Add New Admin
+                  </button>
+                </div>
+
+                <div className="grid gap-4">
+                  {adminList.map(admin => (
+                    <div key={admin.id} className="bg-[#1a1f37]/50 border border-white/10 rounded-xl p-6 hover:border-purple-500/30 transition">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h3 className="text-xl font-bold text-white mb-2">{admin.name}</h3>
+                          <p className="text-gray-400 text-sm mb-1">
+                            <Mail className="w-4 h-4 inline mr-2" />
+                            {admin.email}
+                          </p>
+                          <span className="inline-block bg-blue-500/20 border border-blue-500/30 text-blue-300 px-3 py-1 rounded-full text-xs font-semibold">
+                            Admin
+                          </span>
+                        </div>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => openEditModal(admin)}
+                            className="px-4 py-2 bg-blue-500/20 border border-blue-500/30 text-blue-300 rounded-lg hover:bg-blue-500/30 transition flex items-center gap-2"
+                          >
+                            <FileText className="w-4 h-4" />
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => deleteAdmin(admin.id)}
+                            className="px-4 py-2 bg-red-500/20 border border-red-500/30 text-red-300 rounded-lg hover:bg-red-500/30 transition flex items-center gap-2"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Add Admin Modal */}
+          {showAddAdminModal && (
+            <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+              <div className="bg-gradient-to-br from-[#2a2f4a] to-[#1e2337] rounded-2xl border border-white/10 p-8 max-w-md w-full">
+                <h3 className="text-2xl font-bold text-white mb-6">Add New Admin</h3>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-300 mb-2">Name</label>
+                    <input
+                      type="text"
+                      value={newAdminData.name}
+                      onChange={(e) => setNewAdminData({...newAdminData, name: e.target.value})}
+                      className="w-full px-4 py-3 bg-[#0d1229] border border-white/10 rounded-xl text-white focus:outline-none focus:border-purple-500 transition"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-300 mb-2">Email</label>
+                    <input
+                      type="email"
+                      value={newAdminData.email}
+                      onChange={(e) => setNewAdminData({...newAdminData, email: e.target.value})}
+                      className="w-full px-4 py-3 bg-[#0d1229] border border-white/10 rounded-xl text-white focus:outline-none focus:border-purple-500 transition"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-300 mb-2">Password</label>
+                    <input
+                      type="password"
+                      value={newAdminData.password}
+                      onChange={(e) => setNewAdminData({...newAdminData, password: e.target.value})}
+                      className="w-full px-4 py-3 bg-[#0d1229] border border-white/10 rounded-xl text-white focus:outline-none focus:border-purple-500 transition"
+                    />
+                  </div>
+                </div>
+                <div className="flex gap-3 mt-6">
+                  <button
+                    onClick={handleAddAdmin}
+                    className="flex-1 py-3 bg-gradient-to-r from-purple-500 to-pink-600 text-white rounded-xl font-bold hover:from-purple-600 hover:to-pink-700 transition"
+                  >
+                    Add Admin
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowAddAdminModal(false);
+                      setNewAdminData({ name: '', email: '', password: '' });
+                    }}
+                    className="flex-1 py-3 bg-gray-600 text-white rounded-xl font-bold hover:bg-gray-700 transition"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Edit Admin Modal */}
+          {showEditAdminModal && editingAdmin && (
+            <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+              <div className="bg-gradient-to-br from-[#2a2f4a] to-[#1e2337] rounded-2xl border border-white/10 p-8 max-w-md w-full">
+                <h3 className="text-2xl font-bold text-white mb-6">Edit Admin</h3>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-300 mb-2">Name</label>
+                    <input
+                      type="text"
+                      value={newAdminData.name}
+                      onChange={(e) => setNewAdminData({...newAdminData, name: e.target.value})}
+                      className="w-full px-4 py-3 bg-[#0d1229] border border-white/10 rounded-xl text-white focus:outline-none focus:border-purple-500 transition"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-300 mb-2">Email</label>
+                    <input
+                      type="email"
+                      value={newAdminData.email}
+                      onChange={(e) => setNewAdminData({...newAdminData, email: e.target.value})}
+                      className="w-full px-4 py-3 bg-[#0d1229] border border-white/10 rounded-xl text-white focus:outline-none focus:border-purple-500 transition"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-300 mb-2">New Password (optional)</label>
+                    <input
+                      type="password"
+                      value={newAdminData.password}
+                      onChange={(e) => setNewAdminData({...newAdminData, password: e.target.value})}
+                      placeholder="Leave blank to keep current"
+                      className="w-full px-4 py-3 bg-[#0d1229] border border-white/10 rounded-xl text-white focus:outline-none focus:border-purple-500 transition"
+                    />
+                  </div>
+                </div>
+                <div className="flex gap-3 mt-6">
+                  <button
+                    onClick={handleEditAdmin}
+                    className="flex-1 py-3 bg-gradient-to-r from-purple-500 to-pink-600 text-white rounded-xl font-bold hover:from-purple-600 hover:to-pink-700 transition"
+                  >
+                    Save Changes
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowEditAdminModal(false);
+                      setEditingAdmin(null);
+                      setNewAdminData({ name: '', email: '', password: '' });
+                    }}
+                    className="flex-1 py-3 bg-gray-600 text-white rounded-xl font-bold hover:bg-gray-700 transition"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
   // Admin Dashboard
   const AdminDashboard = () => (
     <div className={`min-h-screen bg-gradient-to-br from-[#1a1f37] via-[#2d1b4e] to-[#1a1f37] p-8 transition-opacity duration-500 ${fadeIn ? 'opacity-100' : 'opacity-0'} relative overflow-hidden`}>
@@ -2222,13 +2705,14 @@ const App = () => {
                                 <button
                                   key={stall.id}
                                   onClick={() => setHoveredStall(stall.id)}
-                                  className={`px-2 py-1 rounded text-xs font-bold transition ${
+                                  className={`px-2 py-2 rounded text-xs font-bold transition flex flex-col items-center justify-center ${
                                     hoveredStall === stall.id
                                       ? 'bg-orange-500 text-white ring-2 ring-orange-400'
                                       : 'bg-[#2a2f4a] text-gray-300 hover:bg-[#3a3f5a]'
                                   }`}
                                 >
-                                  {stall.id}
+                                  <span className="text-[10px] leading-none">{stall.id}</span>
+                                  <span className="text-[8px] opacity-75 leading-none mt-0.5">{stall.size[0]}</span>
                                 </button>
                               ))}
                             </div>
@@ -2257,12 +2741,13 @@ const App = () => {
                                   top: `${stall.mapPosition.y}%`
                                 }}
                               >
-                                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
+                                <div className={`w-10 h-10 rounded-full flex flex-col items-center justify-center text-xs font-bold transition-all ${
                                   isActive
                                     ? 'bg-orange-500 text-white ring-4 ring-orange-400/50 scale-125'
                                     : 'bg-blue-500 text-white opacity-70'
                                 }`}>
-                                  {stall.id}
+                                  <span className="text-[10px] leading-none">{stall.id}</span>
+                                  <span className="text-[8px] opacity-75 leading-none mt-0.5">{stall.size[0]}</span>
                                 </div>
                               </div>
                             );
@@ -2645,12 +3130,15 @@ const App = () => {
       
       {currentView === 'landing' && <LandingPage />}
       {currentView === 'admin_landing' && <AdminLandingPage />}
+      {currentView === 'superadmin_landing' && <SuperAdminLandingPage />}
       {currentView === 'vendor_auth' && <VendorAuth />}
       {currentView === 'vendor_register' && <VendorRegister />}
       {currentView === 'vendor_map' && <VendorMapView />}
       {currentView === 'vendor_home' && <VendorHome />}
       {currentView === 'admin_login' && <AdminLogin />}
       {currentView === 'admin_dashboard' && <AdminDashboard />}
+      {currentView === 'superadmin_login' && <SuperAdminLogin />}
+      {currentView === 'superadmin_dashboard' && <SuperAdminDashboard />}
     </div>
   );
 };
