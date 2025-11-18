@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { MapPin, CheckCircle, Building, Mail, Lock, Plus, LogOut, Home, Users, Target, Award, Trash2, FileText, X, Sparkles } from 'lucide-react';
+import { MapPin, CheckCircle, Building, Mail, Lock, Plus, LogOut, Home, Users, Target, Award, Trash2, FileText, X, Sparkles, Menu, LayoutDashboard, Settings, BarChart3 } from 'lucide-react';
 
 const SuperAdminPortal = () => {
   const [currentView, setCurrentView] = useState('superadmin_landing');
@@ -7,8 +7,9 @@ const SuperAdminPortal = () => {
     const savedStalls = localStorage.getItem('tradeHallStalls');
     return savedStalls ? JSON.parse(savedStalls) : [];
   });
-  const [superAdminTab, setSuperAdminTab] = useState('admins');
+  const [superAdminTab, setSuperAdminTab] = useState('dashboard');
   const [fadeIn, setFadeIn] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [adminList, setAdminList] = useState(() => {
     const savedAdmins = localStorage.getItem('bookfairAdmins');
     return savedAdmins ? JSON.parse(savedAdmins) : [
@@ -512,25 +513,130 @@ const SuperAdminPortal = () => {
       alert('❌ Booking request rejected. Stall released.');
     };
     return (
-      <div className={`min-h-screen bg-gradient-to-br from-[#1a1f37] via-[#4a1b2d] to-[#1a1f37] p-8 transition-opacity duration-500 ${fadeIn ? 'opacity-100' : 'opacity-0'} relative overflow-hidden`}>
+      <div className={`min-h-screen bg-gradient-to-br from-[#1a1f37] via-[#4a1b2d] to-[#1a1f37] transition-opacity duration-500 ${fadeIn ? 'opacity-100' : 'opacity-0'} relative overflow-hidden flex`}>
         <div className="background-orbs">
           <div className="orb orb-1"></div>
           <div className="orb orb-2"></div>
           <div className="orb orb-3"></div>
         </div>
 
-        <div className="max-w-7xl mx-auto relative z-10">
-          <div className="flex justify-between items-center mb-6">
-            <div className="flex items-center gap-3">
-              <div className="bg-gradient-to-br from-purple-500 to-pink-600 p-3 rounded-xl shadow-lg relative">
-                <Award className="w-8 h-8 text-white" />
-                <Sparkles className="w-4 h-4 text-yellow-300 absolute -top-1 -right-1 animate-sparkle" />
+        {/* Sidebar */}
+        <div className={`${sidebarOpen ? 'w-64' : 'w-20'} transition-all duration-300 bg-[#1e2337]/80 backdrop-blur-xl border-r border-white/10 flex flex-col relative z-20`}>
+          <div className="p-6 flex items-center justify-between border-b border-white/10">
+            {sidebarOpen && (
+              <div className="flex items-center gap-2">
+                <div className="bg-gradient-to-br from-purple-500 to-pink-600 p-2 rounded-lg">
+                  <Award className="w-5 h-5 text-white" />
+                </div>
+                <span className="text-white font-bold text-lg">SuperAdmin</span>
               </div>
-              <div>
-                <h2 className="text-3xl font-bold text-white">Super Admin Dashboard</h2>
-                <p className="text-gray-300 text-sm">Master control panel</p>
-              </div>
+            )}
+            <button
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="text-gray-400 hover:text-white transition p-2 hover:bg-white/5 rounded-lg"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+          </div>
+
+          <nav className="flex-1 p-4 space-y-2">
+            <button
+              onClick={() => setSuperAdminTab('dashboard')}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition ${
+                superAdminTab === 'dashboard'
+                  ? 'bg-gradient-to-r from-purple-500/20 to-pink-600/20 text-white border border-purple-500/30'
+                  : 'text-gray-400 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              <LayoutDashboard className="w-5 h-5" />
+              {sidebarOpen && <span className="font-semibold">Dashboard</span>}
+            </button>
+
+            <button
+              onClick={() => setSuperAdminTab('requests')}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition ${
+                superAdminTab === 'requests'
+                  ? 'bg-gradient-to-r from-purple-500/20 to-pink-600/20 text-white border border-purple-500/30'
+                  : 'text-gray-400 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              <CheckCircle className="w-5 h-5" />
+              {sidebarOpen && (
+                <div className="flex items-center justify-between flex-1">
+                  <span className="font-semibold">Booking Requests</span>
+                  {pendingRequests.length > 0 && (
+                    <span className="bg-orange-500/30 text-orange-300 text-xs px-2 py-1 rounded-full font-semibold">
+                      {pendingRequests.length}
+                    </span>
+                  )}
+                </div>
+              )}
+            </button>
+
+            <button
+              onClick={() => setSuperAdminTab('availability')}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition ${
+                superAdminTab === 'availability'
+                  ? 'bg-gradient-to-r from-purple-500/20 to-pink-600/20 text-white border border-purple-500/30'
+                  : 'text-gray-400 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              <Building className="w-5 h-5" />
+              {sidebarOpen && <span className="font-semibold">Availability</span>}
+            </button>
+
+            <button
+              onClick={() => setSuperAdminTab('reservations')}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition ${
+                superAdminTab === 'reservations'
+                  ? 'bg-gradient-to-r from-purple-500/20 to-pink-600/20 text-white border border-purple-500/30'
+                  : 'text-gray-400 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              <CheckCircle className="w-5 h-5" />
+              {sidebarOpen && <span className="font-semibold">Reservations</span>}
+            </button>
+
+            <div className="pt-4 border-t border-white/10 space-y-2">
+              <button
+                onClick={() => setSuperAdminTab('admins')}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition ${
+                  superAdminTab === 'admins'
+                    ? 'bg-gradient-to-r from-purple-500/20 to-pink-600/20 text-white border border-purple-500/30'
+                    : 'text-gray-400 hover:text-white hover:bg-white/5'
+                }`}
+              >
+                <Users className="w-5 h-5" />
+                {sidebarOpen && <span className="font-semibold">Manage Admins</span>}
+              </button>
+
+              <button
+                onClick={() => setSuperAdminTab('stallconfig')}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition ${
+                  superAdminTab === 'stallconfig'
+                    ? 'bg-gradient-to-r from-purple-500/20 to-pink-600/20 text-white border border-purple-500/30'
+                    : 'text-gray-400 hover:text-white hover:bg-white/5'
+                }`}
+              >
+                <Settings className="w-5 h-5" />
+                {sidebarOpen && <span className="font-semibold">Stall Configuration</span>}
+              </button>
+
+              <button
+                onClick={() => setSuperAdminTab('mapupload')}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition ${
+                  superAdminTab === 'mapupload'
+                    ? 'bg-gradient-to-r from-purple-500/20 to-pink-600/20 text-white border border-purple-500/30'
+                    : 'text-gray-400 hover:text-white hover:bg-white/5'
+                }`}
+              >
+                <MapPin className="w-5 h-5" />
+                {sidebarOpen && <span className="font-semibold">Map Management</span>}
+              </button>
             </div>
+          </nav>
+
+          <div className="p-4 border-t border-white/10">
             <button
               onClick={() => {
                 if (window.location.pathname.startsWith('/adminx')) {
@@ -539,14 +645,70 @@ const SuperAdminPortal = () => {
                   setCurrentView('superadmin_landing');
                 }
               }}
-              className="px-6 py-3 bg-gradient-to-r from-red-500 to-pink-600 text-white rounded-xl font-bold hover:from-red-600 hover:to-pink-700 transition shadow-lg flex items-center gap-2"
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition bg-gradient-to-r from-red-500/20 to-pink-600/20 text-red-300 hover:from-red-500/30 hover:to-pink-600/30 border border-red-500/30`}
             >
               <LogOut className="w-5 h-5" />
-              Logout
+              {sidebarOpen && <span className="font-semibold">Logout</span>}
             </button>
           </div>
+        </div>
 
-          {/* Booking Status Overview */}
+        {/* Main Content */}
+        <div className="flex-1 overflow-auto">
+          <div className="p-8">
+            {/* Header */}
+            <div className="mb-8">
+              <h1 className="text-3xl font-bold text-white flex items-center gap-3">
+                {superAdminTab === 'dashboard' && (
+                  <>
+                    <LayoutDashboard className="w-8 h-8 text-purple-400" />
+                    Dashboard Overview
+                  </>
+                )}
+                {superAdminTab === 'requests' && (
+                  <>
+                    <CheckCircle className="w-8 h-8 text-orange-400" />
+                    Booking Requests
+                  </>
+                )}
+                {superAdminTab === 'availability' && (
+                  <>
+                    <Building className="w-8 h-8 text-blue-400" />
+                    Stall Availability
+                  </>
+                )}
+                {superAdminTab === 'reservations' && (
+                  <>
+                    <CheckCircle className="w-8 h-8 text-green-400" />
+                    Confirmed Reservations
+                  </>
+                )}
+                {superAdminTab === 'admins' && (
+                  <>
+                    <Users className="w-8 h-8 text-pink-400" />
+                    Admin Management
+                  </>
+                )}
+                {superAdminTab === 'stallconfig' && (
+                  <>
+                    <Settings className="w-8 h-8 text-cyan-400" />
+                    Stall Configuration
+                  </>
+                )}
+                {superAdminTab === 'mapupload' && (
+                  <>
+                    <MapPin className="w-8 h-8 text-purple-400" />
+                    Map Management
+                  </>
+                )}
+              </h1>
+              <p className="text-gray-400 mt-1">Master control panel</p>
+            </div>
+
+            {/* Dashboard Tab */}
+            {superAdminTab === 'dashboard' && (
+              <div>
+                {/* Booking Status Overview */}
           <div className="grid md:grid-cols-3 gap-6 mb-8">
             <div className="md:col-span-1 bg-gradient-to-br from-[#2a2f4a]/80 to-[#1e2337]/80 backdrop-blur-xl rounded-3xl border border-white/10 p-6 flex flex-col items-center justify-center">
               <h3 className="text-sm font-semibold text-gray-300 mb-3">Booking Status</h3>
@@ -581,113 +743,116 @@ const SuperAdminPortal = () => {
               </div>
             </div>
           </div>
+              </div>
+            )}
 
-          <div className="bg-gradient-to-br from-[#2a2f4a]/80 to-[#1e2337]/80 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl p-8">
-            <div className="flex gap-4 mb-6 border-b border-white/10 overflow-x-auto">
-              <button
-                type="button"
-                onClick={() => setSuperAdminTab('admins')}
-                className={`px-6 py-3 font-semibold transition-all rounded-t-xl relative whitespace-nowrap ${
-                  superAdminTab === 'admins' ? 'text-white' : 'text-gray-400 hover:text-gray-200'
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  <Users className="w-5 h-5" />
-                  Manage Admins
-                </div>
-                {superAdminTab === 'admins' && (
-                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full"></div>
+            {/* Booking Requests Tab */}
+            {superAdminTab === 'requests' && (
+              <div>
+                {pendingRequests.length === 0 ? (
+                  <div className="bg-[#1a1f37]/50 border border-white/10 rounded-xl p-8 text-center text-gray-400">
+                    No pending requests at the moment.
+                  </div>
+                ) : (
+                  <div className="grid md:grid-cols-2 gap-5">
+                    {pendingRequests.map(stall => (
+                      <div key={stall.id} className="bg-[#1a1f37]/50 border border-orange-500/40 rounded-xl p-6 relative">
+                        <div className="flex justify-between items-start mb-3">
+                          <div>
+                            <div className="text-xl font-bold text-white">{stall.id}</div>
+                            <div className="text-xs text-gray-400">Size: {stall.size}</div>
+                            <div className="mt-2 text-sm text-gray-300">
+                              <span className="font-semibold text-pink-300">{stall.businessName}</span>
+                              <br />
+                              <span className="text-xs text-gray-400">{stall.email}</span>
+                            </div>
+                          </div>
+                          <span className="text-xs bg-orange-500/30 text-orange-300 px-2 py-1 rounded-full font-semibold">Pending</span>
+                        </div>
+                        <div className="text-xs text-gray-400 mb-4">
+                          Requested: {stall.requestDate ? new Date(stall.requestDate).toLocaleString() : '—'}
+                        </div>
+                        <div className="flex gap-3">
+                          <button
+                            type="button"
+                            onClick={() => approveBooking(stall.id)}
+                            className="flex-1 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg font-semibold hover:from-green-600 hover:to-emerald-700 transition flex items-center justify-center gap-2"
+                          >
+                            <CheckCircle className="w-4 h-4" /> Approve
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => rejectBooking(stall.id)}
+                            className="flex-1 py-2 bg-gradient-to-r from-red-500 to-pink-600 text-white rounded-lg font-semibold hover:from-red-600 hover:to-pink-700 transition flex items-center justify-center gap-2"
+                          >
+                            <X className="w-4 h-4" /> Reject
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 )}
-              </button>
-              <button
-                type="button"
-                onClick={() => setSuperAdminTab('stallconfig')}
-                className={`px-6 py-3 font-semibold transition-all rounded-t-xl relative whitespace-nowrap ${
-                  superAdminTab === 'stallconfig' ? 'text-white' : 'text-gray-400 hover:text-gray-200'
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  <Building className="w-5 h-5" />
-                  Stall Configuration
+              </div>
+            )}
+
+            {/* Availability Tab */}
+            {superAdminTab === 'availability' && (
+              <div>
+                <div className="grid grid-cols-5 gap-4">
+                  {stalls.filter(s => !s.isEmpty).map(stall => (
+                    <div key={stall.id} className={`p-4 rounded-xl border-2 text-center text-sm font-semibold transition ${
+                      stall.pending ? 'bg-orange-500/15 border-orange-500/40 text-orange-300' :
+                      stall.reserved ? 'bg-green-500/15 border-green-500/40 text-green-300' :
+                      'bg-blue-500/10 border-blue-500/30 text-blue-300'
+                    }`}>
+                      <div className="text-lg font-bold text-white">{stall.id}</div>
+                      <div className="text-xs text-gray-400">{stall.size}</div>
+                      {stall.pending && <div className="mt-1 text-xs text-orange-400">Pending</div>}
+                      {stall.reserved && !stall.pending && <div className="mt-1 text-xs text-green-400">Reserved</div>}
+                    </div>
+                  ))}
                 </div>
-                {superAdminTab === 'stallconfig' && (
-                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full"></div>
+              </div>
+            )}
+
+            {/* Reservations Tab */}
+            {superAdminTab === 'reservations' && (
+              <div>
+                {reservedStalls.length === 0 ? (
+                  <div className="bg-[#1a1f37]/50 border border-white/10 rounded-xl p-8 text-center text-gray-400">
+                    No confirmed reservations yet.
+                  </div>
+                ) : (
+                  <div className="grid md:grid-cols-3 gap-5">
+                    {reservedStalls.map(stall => (
+                      <div key={stall.id} className="bg-[#1a1f37]/50 border border-green-500/40 rounded-xl p-6">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <div className="text-xl font-bold text-white">{stall.id}</div>
+                            <div className="text-xs text-gray-400">Size: {stall.size}</div>
+                            <div className="mt-2 text-sm text-gray-300 font-semibold">{stall.businessName}</div>
+                            <div className="text-xs text-gray-400">{stall.email}</div>
+                          </div>
+                          <span className="text-xs bg-green-500/30 text-green-300 px-2 py-1 rounded-full font-semibold">Approved</span>
+                        </div>
+                        <div className="text-xs text-gray-400 mt-3">
+                          Approved: {stall.approvedDate ? new Date(stall.approvedDate).toLocaleString() : '—'}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 )}
-              </button>
-              <button
-                type="button"
-                onClick={() => setSuperAdminTab('mapupload')}
-                className={`px-6 py-3 font-semibold transition-all rounded-t-xl relative whitespace-nowrap ${
-                  superAdminTab === 'mapupload' ? 'text-white' : 'text-gray-400 hover:text-gray-200'
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  <MapPin className="w-5 h-5" />
-                  Map Management
-                </div>
-                {superAdminTab === 'mapupload' && (
-                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full"></div>
-                )}
-              </button>
-              <button
-                type="button"
-                onClick={() => setSuperAdminTab('requests')}
-                className={`px-6 py-3 font-semibold transition-all rounded-t-xl relative whitespace-nowrap ${
-                  superAdminTab === 'requests' ? 'text-white' : 'text-gray-400 hover:text-gray-200'
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5" />
-                  Booking Requests
-                  {pendingRequests.length > 0 && (
-                    <span className="ml-2 bg-orange-500/30 text-orange-300 text-xs px-2 py-1 rounded-full font-semibold">{pendingRequests.length}</span>
-                  )}
-                </div>
-                {superAdminTab === 'requests' && (
-                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full"></div>
-                )}
-              </button>
-              <button
-                type="button"
-                onClick={() => setSuperAdminTab('availability')}
-                className={`px-6 py-3 font-semibold transition-all rounded-t-xl relative whitespace-nowrap ${
-                  superAdminTab === 'availability' ? 'text-white' : 'text-gray-400 hover:text-gray-200'
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  <Building className="w-5 h-5" />
-                  Availability
-                </div>
-                {superAdminTab === 'availability' && (
-                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full"></div>
-                )}
-              </button>
-              <button
-                type="button"
-                onClick={() => setSuperAdminTab('reservations')}
-                className={`px-6 py-3 font-semibold transition-all rounded-t-xl relative whitespace-nowrap ${
-                  superAdminTab === 'reservations' ? 'text-white' : 'text-gray-400 hover:text-gray-200'
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5" />
-                  Reservations
-                </div>
-                {superAdminTab === 'reservations' && (
-                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full"></div>
-                )}
-              </button>
-            </div>
+              </div>
+            )}
 
             {/* Manage Admins Tab */}
             {superAdminTab === 'admins' && (
               <div>
                 <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-2xl font-bold text-white">Admin Accounts</h2>
                   <button
                     type="button"
                     onClick={() => setShowAddAdminModal(true)}
-                    className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-600 text-white rounded-xl font-semibold hover:from-purple-600 hover:to-pink-700 transition flex items-center gap-2"
+                    className="ml-auto px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-600 text-white rounded-xl font-semibold hover:from-purple-600 hover:to-pink-700 transition flex items-center gap-2"
                   >
                     <Plus className="w-5 h-5" />
                     Add New Admin
@@ -1031,64 +1196,14 @@ const SuperAdminPortal = () => {
                 )}
               </div>
             )}
-            {/* Availability Tab */}
-            {superAdminTab === 'availability' && (
-              <div>
-                <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-                  <Building className="w-6 h-6 text-blue-400" /> Stall Availability
-                </h2>
-                <div className="grid grid-cols-5 gap-4 mb-8">
-                  {stalls.filter(s => !s.isEmpty).map(stall => (
-                    <div key={stall.id} className={`p-4 rounded-xl border-2 text-center text-sm font-semibold transition $${'{'}
-                      stall.pending ? 'bg-orange-500/15 border-orange-500/40 text-orange-300' :
-                      stall.reserved ? 'bg-green-500/15 border-green-500/40 text-green-300' :
-                      'bg-blue-500/10 border-blue-500/30 text-blue-300'
-                    }`}>
-                      <div className="text-lg font-bold text-white">{stall.id}</div>
-                      <div className="text-xs text-gray-400">{stall.size}</div>
-                      {stall.pending && <div className="mt-1 text-xs text-orange-400">Pending</div>}
-                      {stall.reserved && !stall.pending && <div className="mt-1 text-xs text-green-400">Reserved</div>}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-            {/* Reservations Tab */}
-            {superAdminTab === 'reservations' && (
-              <div>
-                <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-                  <CheckCircle className="w-6 h-6 text-green-400" /> Confirmed Reservations
-                </h2>
-                {reservedStalls.length === 0 ? (
-                  <div className="bg-[#1a1f37]/50 border border-white/10 rounded-xl p-8 text-center text-gray-400">
-                    No confirmed reservations yet.
-                  </div>
-                ) : (
-                  <div className="grid md:grid-cols-3 gap-5">
-                    {reservedStalls.map(stall => (
-                      <div key={stall.id} className="bg-[#1a1f37]/50 border border-green-500/40 rounded-xl p-6">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <div className="text-xl font-bold text-white">{stall.id}</div>
-                            <div className="text-xs text-gray-400">Size: {stall.size}</div>
-                            <div className="mt-2 text-sm text-gray-300 font-semibold">{stall.businessName}</div>
-                            <div className="text-xs text-gray-400">{stall.email}</div>
-                          </div>
-                          <span className="text-xs bg-green-500/30 text-green-300 px-2 py-1 rounded-full font-semibold">Approved</span>
-                        </div>
-                        <div className="text-xs text-gray-400 mt-3">
-                          Approved: {stall.approvedDate ? new Date(stall.approvedDate).toLocaleString() : '—'}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
 
-          {/* Add Admin Modal */}
-          {showAddAdminModal && (
+            {/* Availability Tab (duplicate removed) */}
+            {/* Reservations Tab (duplicate removed) */}
+          </div>
+        </div>
+
+        {/* Modals */}
+        {showAddAdminModal && (
             <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
               <div className="bg-gradient-to-br from-[#2a2f4a] to-[#1e2337] rounded-2xl border border-white/10 p-8 max-w-md w-full">
                 <h3 className="text-2xl font-bold text-white mb-6">Add New Admin</h3>
@@ -1202,7 +1317,6 @@ const SuperAdminPortal = () => {
               </div>
             </div>
           )}
-        </div>
       </div>
     );
   };
