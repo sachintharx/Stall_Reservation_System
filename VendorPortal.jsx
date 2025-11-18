@@ -593,7 +593,7 @@ const VendorPortal = () => {
     const selectedStallObjects = stalls.filter(s => selectedStalls.includes(s.id));
 
     return (
-      <div className={`min-h-screen bg-gradient-to-br from-[#1a1f37] via-[#2d1b4e] to-[#1a1f37] p-8 transition-opacity duration-500 ${fadeIn ? 'opacity-100' : 'opacity-0'} relative overflow-hidden`}>
+      <div className={`min-h-screen bg-gradient-to-br from-[#1a1f37] via-[#2d1b4e] to-[#1a1f37] p-4 sm:p-6 md:p-8 transition-opacity duration-500 ${fadeIn ? 'opacity-100' : 'opacity-0'} relative overflow-hidden`}>
         <div className="background-orbs">
           <div className="orb orb-1"></div>
           <div className="orb orb-2"></div>
@@ -601,15 +601,15 @@ const VendorPortal = () => {
         </div>
 
         <div className="max-w-7xl mx-auto relative z-10">
-          <div className="flex justify-between items-center mb-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
             <div>
-              <h2 className="text-3xl font-bold text-white flex items-center gap-2">
+              <h2 className="text-2xl sm:text-3xl font-bold text-white flex items-center gap-2">
                 <BookOpen className="w-8 h-8 text-pink-400" />
                 Welcome, {vendorInfo.businessName}!
               </h2>
-              <p className="text-gray-300">Reserve your perfect stall location</p>
+              <p className="text-sm sm:text-base text-gray-300">Reserve your perfect stall location</p>
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 sm:gap-4 flex-wrap">
               {stallMapImage && (
                 <button
                   onClick={() => setUseMapView(!useMapView)}
@@ -634,11 +634,11 @@ const VendorPortal = () => {
           </div>
 
           {/* Tabs */}
-          <div className="flex gap-4 mb-6 border-b border-white/10">
+          <div className="flex gap-2 sm:gap-4 mb-6 border-b border-white/10 overflow-x-auto">
             <button
               type="button"
               onClick={() => { setVendorHomeTab('booking'); setBookingStep(1); }}
-              className={`px-6 py-3 font-semibold transition-all rounded-t-xl relative ${vendorHomeTab === 'booking' ? 'text-white' : 'text-gray-400 hover:text-gray-200'}`}
+              className={`px-4 sm:px-6 py-3 font-semibold transition-all rounded-t-xl relative whitespace-nowrap ${vendorHomeTab === 'booking' ? 'text-white' : 'text-gray-400 hover:text-gray-200'}`}
             >
               <div className="flex items-center gap-2">
                 <Calendar className="w-5 h-5" />
@@ -649,7 +649,7 @@ const VendorPortal = () => {
             <button
               type="button"
               onClick={() => setVendorHomeTab('profile')}
-              className={`px-6 py-3 font-semibold transition-all rounded-t-xl relative ${vendorHomeTab === 'profile' ? 'text-white' : 'text-gray-400 hover:text-gray-200'}`}
+              className={`px-4 sm:px-6 py-3 font-semibold transition-all rounded-t-xl relative whitespace-nowrap ${vendorHomeTab === 'profile' ? 'text-white' : 'text-gray-400 hover:text-gray-200'}`}
             >
               <div className="flex items-center gap-2">
                 <User className="w-5 h-5" />
@@ -660,12 +660,12 @@ const VendorPortal = () => {
           </div>
 
           {vendorHomeTab === 'profile' && (
-            <div className="bg-gradient-to-br from-[#2a2f4a]/80 to-[#1e2337]/80 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl p-8">
-              <h3 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
-                <User className="w-6 h-6 text-pink-400" />
+            <div className="bg-gradient-to-br from-[#2a2f4a]/80 to-[#1e2337]/80 backdrop-blur-xl rounded-2xl sm:rounded-3xl border border-white/10 shadow-2xl p-4 sm:p-6 md:p-8">
+              <h3 className="text-xl sm:text-2xl font-bold text-white mb-4 flex items-center gap-2">
+                <User className="w-5 h-5 sm:w-6 sm:h-6 text-pink-400" />
                 Profile Information
               </h3>
-              <div className="grid md:grid-cols-2 gap-6 mb-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
                 <div>
                   <label className="block text-sm font-semibold text-gray-300 mb-2">Business Name</label>
                   <input
@@ -818,7 +818,7 @@ const VendorPortal = () => {
                       </div>
                     </div>
                   ) : (
-                    <div className="grid grid-cols-5 gap-4 mb-8">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 mb-8">
                       {stalls.filter(s => !s.isEmpty).map(stall => {
                         const isSelected = selectedStalls.includes(stall.id);
                         const isMyReservation = stall.businessName === vendorInfo.businessName;
@@ -854,7 +854,7 @@ const VendorPortal = () => {
                   {selectedStallObjects.length === 0 ? (
                     <p className="text-gray-400">No stalls selected. Go back to selection.</p>
                   ) : (
-                    <div className="grid grid-cols-3 gap-4 mb-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6">
                       {selectedStallObjects.map(stall => (
                         <div key={stall.id} className="p-4 rounded-xl border border-pink-500/40 bg-pink-500/10 relative">
                           <div className="text-lg font-bold text-white">{stall.id}</div>
@@ -910,13 +910,13 @@ const VendorPortal = () => {
 
               {/* Floating next button for step 1 */}
               {bookingStep === 1 && selectedStalls.length > 0 && (
-                <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50">
-                  <div className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-8 py-4 rounded-full shadow-2xl flex items-center gap-4">
-                    <span className="font-bold">{selectedStalls.length} stall(s) selected</span>
+                <div className="fixed bottom-4 sm:bottom-8 left-1/2 transform -translate-x-1/2 z-50 w-[calc(100%-2rem)] sm:w-auto">
+                  <div className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-4 sm:px-8 py-3 sm:py-4 rounded-full shadow-2xl flex items-center justify-between gap-2 sm:gap-4">
+                    <span className="font-bold text-sm sm:text-base">{selectedStalls.length} stall(s) selected</span>
                     <button
                       type="button"
                       onClick={() => setBookingStep(2)}
-                      className="bg-white text-purple-600 px-6 py-2 rounded-full font-bold hover:bg-gray-100 transition"
+                      className="bg-white text-purple-600 px-4 sm:px-6 py-2 rounded-full font-bold hover:bg-gray-100 transition text-sm sm:text-base"
                     >Review Selection</button>
                   </div>
                 </div>
@@ -926,12 +926,12 @@ const VendorPortal = () => {
           
 
           {myReservations.length > 0 && (
-            <div className="mt-8 bg-gradient-to-br from-[#2a2f4a]/80 to-[#1e2337]/80 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl p-8">
-              <h3 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
-                <CheckCircle className="w-6 h-6 text-green-400" />
+            <div className="mt-6 sm:mt-8 bg-gradient-to-br from-[#2a2f4a]/80 to-[#1e2337]/80 backdrop-blur-xl rounded-2xl sm:rounded-3xl border border-white/10 shadow-2xl p-4 sm:p-6 md:p-8">
+              <h3 className="text-xl sm:text-2xl font-bold text-white mb-4 flex items-center gap-2">
+                <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-green-400" />
                 Your Bookings
               </h3>
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {myReservations.map(stall => (
                   <div key={stall.id} className={`rounded-xl p-4 border-2 ${
                     stall.pending 

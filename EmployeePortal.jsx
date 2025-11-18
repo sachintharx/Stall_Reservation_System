@@ -405,8 +405,8 @@ const EmployeePortal = () => {
           </button>
         </div>
 
-        <div className="bg-gradient-to-br from-[#2a2f4a]/80 to-[#1e2337]/80 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl p-8 mb-6">
-          <div className="flex gap-4 mb-6 border-b border-white/10">
+          <div className="bg-gradient-to-br from-[#2a2f4a]/80 to-[#1e2337]/80 backdrop-blur-xl rounded-2xl sm:rounded-3xl border border-white/10 shadow-2xl p-4 sm:p-6 md:p-8">
+            <div className="flex gap-2 sm:gap-4 mb-6 border-b border-white/10 overflow-x-auto">
             <button
               type="button"
               onClick={() => setAdminTab('requests')}

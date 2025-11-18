@@ -10,6 +10,7 @@ const SuperAdminPortal = () => {
   const [superAdminTab, setSuperAdminTab] = useState('dashboard');
   const [fadeIn, setFadeIn] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [adminList, setAdminList] = useState(() => {
     const savedAdmins = localStorage.getItem('bookfairAdmins');
     return savedAdmins ? JSON.parse(savedAdmins) : [
@@ -521,7 +522,7 @@ const SuperAdminPortal = () => {
         </div>
 
         {/* Sidebar */}
-        <div className={`${sidebarOpen ? 'w-64' : 'w-20'} transition-all duration-300 bg-[#1e2337]/80 backdrop-blur-xl border-r border-white/10 flex flex-col relative z-20`}>
+        <div className={`${sidebarOpen ? 'w-64' : 'w-20'} transition-all duration-300 bg-[#1e2337]/80 backdrop-blur-xl border-r border-white/10 flex-col relative z-20 hidden md:flex`}>
           <div className="p-6 flex items-center justify-between border-b border-white/10">
             {sidebarOpen && (
               <div className="flex items-center gap-2">
@@ -653,13 +654,135 @@ const SuperAdminPortal = () => {
           </div>
         </div>
 
+        {/* Mobile Menu Overlay */}
+        {mobileMenuOpen && (
+          <div className="md:hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-40" onClick={() => setMobileMenuOpen(false)}>
+            <div className="bg-[#1e2337] w-64 h-full p-6 space-y-2 overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+              <div className="flex items-center justify-between mb-6 pb-4 border-b border-white/10">
+                <div className="flex items-center gap-2">
+                  <div className="bg-gradient-to-br from-purple-500 to-pink-600 p-2 rounded-lg">
+                    <Award className="w-5 h-5 text-white" />
+                  </div>
+                  <span className="text-white font-bold text-lg">SuperAdmin</span>
+                </div>
+                <button onClick={() => setMobileMenuOpen(false)} className="text-gray-400 hover:text-white">
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+
+              <button
+                onClick={() => { setSuperAdminTab('dashboard'); setMobileMenuOpen(false); }}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition ${
+                  superAdminTab === 'dashboard'
+                    ? 'bg-gradient-to-r from-purple-500/20 to-pink-600/20 text-white border border-purple-500/30'
+                    : 'text-gray-400 hover:text-white hover:bg-white/5'
+                }`}
+              >
+                <LayoutDashboard className="w-5 h-5" />
+                <span className="font-semibold">Dashboard</span>
+              </button>
+
+              <button
+                onClick={() => { setSuperAdminTab('requests'); setMobileMenuOpen(false); }}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition ${
+                  superAdminTab === 'requests'
+                    ? 'bg-gradient-to-r from-purple-500/20 to-pink-600/20 text-white border border-purple-500/30'
+                    : 'text-gray-400 hover:text-white hover:bg-white/5'
+                }`}
+              >
+                <CheckCircle className="w-5 h-5" />
+                <span className="font-semibold">Booking Requests</span>
+              </button>
+
+              <button
+                onClick={() => { setSuperAdminTab('availability'); setMobileMenuOpen(false); }}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition ${
+                  superAdminTab === 'availability'
+                    ? 'bg-gradient-to-r from-purple-500/20 to-pink-600/20 text-white border border-purple-500/30'
+                    : 'text-gray-400 hover:text-white hover:bg-white/5'
+                }`}
+              >
+                <Building className="w-5 h-5" />
+                <span className="font-semibold">Availability</span>
+              </button>
+
+              <button
+                onClick={() => { setSuperAdminTab('reservations'); setMobileMenuOpen(false); }}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition ${
+                  superAdminTab === 'reservations'
+                    ? 'bg-gradient-to-r from-purple-500/20 to-pink-600/20 text-white border border-purple-500/30'
+                    : 'text-gray-400 hover:text-white hover:bg-white/5'
+                }`}
+              >
+                <CheckCircle className="w-5 h-5" />
+                <span className="font-semibold">Reservations</span>
+              </button>
+
+              <div className="pt-4 border-t border-white/10 space-y-2">
+                <button
+                  onClick={() => { setSuperAdminTab('admins'); setMobileMenuOpen(false); }}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition ${
+                    superAdminTab === 'admins'
+                      ? 'bg-gradient-to-r from-purple-500/20 to-pink-600/20 text-white border border-purple-500/30'
+                      : 'text-gray-400 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  <Users className="w-5 h-5" />
+                  <span className="font-semibold">Manage Admins</span>
+                </button>
+
+                <button
+                  onClick={() => { setSuperAdminTab('stallconfig'); setMobileMenuOpen(false); }}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition ${
+                    superAdminTab === 'stallconfig'
+                      ? 'bg-gradient-to-r from-purple-500/20 to-pink-600/20 text-white border border-purple-500/30'
+                      : 'text-gray-400 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  <Settings className="w-5 h-5" />
+                  <span className="font-semibold">Stall Configuration</span>
+                </button>
+
+                <button
+                  onClick={() => { setSuperAdminTab('mapupload'); setMobileMenuOpen(false); }}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition ${
+                    superAdminTab === 'mapupload'
+                      ? 'bg-gradient-to-r from-purple-500/20 to-pink-600/20 text-white border border-purple-500/30'
+                      : 'text-gray-400 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  <MapPin className="w-5 h-5" />
+                  <span className="font-semibold">Map Upload</span>
+                </button>
+              </div>
+
+              <div className="pt-4 border-t border-white/10">
+                <button
+                  onClick={() => { setCurrentView('login'); setMobileMenuOpen(false); }}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-400 hover:text-red-300 hover:bg-red-500/10 transition"
+                >
+                  <LogOut className="w-5 h-5" />
+                  <span className="font-semibold">Logout</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Main Content */}
         <div className="flex-1 overflow-auto">
-          <div className="p-8">
+          <div className="p-4 sm:p-6 md:p-8">
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden fixed top-4 left-4 z-50 p-2 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg shadow-lg"
+            >
+              <Menu className="w-6 h-6 text-white" />
+            </button>
+
             {/* Header */}
-            <div className="mb-8">
-              <h1 className="text-3xl font-bold text-white flex items-center gap-3">
-                {superAdminTab === 'dashboard' && (
+            <div className="mb-6 sm:mb-8">
+              <h1 className="text-2xl sm:text-3xl font-bold text-white flex items-center gap-3 ml-12 md:ml-0">\n                {superAdminTab === 'dashboard' && (
                   <>
                     <LayoutDashboard className="w-8 h-8 text-purple-400" />
                     Dashboard Overview
@@ -709,8 +832,8 @@ const SuperAdminPortal = () => {
             {superAdminTab === 'dashboard' && (
               <div>
                 {/* Booking Status Overview */}
-          <div className="grid md:grid-cols-3 gap-6 mb-8">
-            <div className="md:col-span-1 bg-gradient-to-br from-[#2a2f4a]/80 to-[#1e2337]/80 backdrop-blur-xl rounded-3xl border border-white/10 p-6 flex flex-col items-center justify-center">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
+            <div className="lg:col-span-1 bg-gradient-to-br from-[#2a2f4a]/80 to-[#1e2337]/80 backdrop-blur-xl rounded-2xl sm:rounded-3xl border border-white/10 p-4 sm:p-6 flex flex-col items-center justify-center">
               <h3 className="text-sm font-semibold text-gray-300 mb-3">Booking Status</h3>
               <PieChart data={bookingData} />
               <div className="mt-4 space-y-2 w-full">
@@ -725,8 +848,8 @@ const SuperAdminPortal = () => {
                 ))}
               </div>
             </div>
-            <div className="md:col-span-2 grid sm:grid-cols-3 gap-6">
-              <div className="bg-gradient-to-br from-blue-500/10 to-purple-600/10 border border-blue-500/30 rounded-2xl p-5">
+            <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+              <div className="bg-gradient-to-br from-blue-500/10 to-purple-600/10 border border-blue-500/30 rounded-xl sm:rounded-2xl p-4 sm:p-5">
                 <div className="text-xs text-gray-400 mb-1">AVAILABLE</div>
                 <div className="text-3xl font-bold text-white">{availableStalls}</div>
                 <div className="text-xs text-gray-400 mt-2">Total {totalStalls} stalls</div>
@@ -750,13 +873,13 @@ const SuperAdminPortal = () => {
             {superAdminTab === 'requests' && (
               <div>
                 {pendingRequests.length === 0 ? (
-                  <div className="bg-[#1a1f37]/50 border border-white/10 rounded-xl p-8 text-center text-gray-400">
+                  <div className="bg-[#1a1f37]/50 border border-white/10 rounded-xl p-6 sm:p-8 text-center text-gray-400">
                     No pending requests at the moment.
                   </div>
                 ) : (
-                  <div className="grid md:grid-cols-2 gap-5">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5">
                     {pendingRequests.map(stall => (
-                      <div key={stall.id} className="bg-[#1a1f37]/50 border border-orange-500/40 rounded-xl p-6 relative">
+                      <div key={stall.id} className="bg-[#1a1f37]/50 border border-orange-500/40 rounded-xl p-4 sm:p-6 relative">
                         <div className="flex justify-between items-start mb-3">
                           <div>
                             <div className="text-xl font-bold text-white">{stall.id}</div>
@@ -798,7 +921,7 @@ const SuperAdminPortal = () => {
             {/* Availability Tab */}
             {superAdminTab === 'availability' && (
               <div>
-                <div className="grid grid-cols-5 gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
                   {stalls.filter(s => !s.isEmpty).map(stall => (
                     <div key={stall.id} className={`p-4 rounded-xl border-2 text-center text-sm font-semibold transition ${
                       stall.pending ? 'bg-orange-500/15 border-orange-500/40 text-orange-300' :
@@ -823,9 +946,9 @@ const SuperAdminPortal = () => {
                     No confirmed reservations yet.
                   </div>
                 ) : (
-                  <div className="grid md:grid-cols-3 gap-5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
                     {reservedStalls.map(stall => (
-                      <div key={stall.id} className="bg-[#1a1f37]/50 border border-green-500/40 rounded-xl p-6">
+                      <div key={stall.id} className="bg-[#1a1f37]/50 border border-green-500/40 rounded-xl p-4 sm:p-6">
                         <div className="flex justify-between items-start">
                           <div>
                             <div className="text-xl font-bold text-white">{stall.id}</div>
@@ -848,21 +971,22 @@ const SuperAdminPortal = () => {
             {/* Manage Admins Tab */}
             {superAdminTab === 'admins' && (
               <div>
-                <div className="flex justify-between items-center mb-6">
+                <div className="flex justify-between items-center mb-4 sm:mb-6">
                   <button
                     type="button"
                     onClick={() => setShowAddAdminModal(true)}
-                    className="ml-auto px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-600 text-white rounded-xl font-semibold hover:from-purple-600 hover:to-pink-700 transition flex items-center gap-2"
+                    className="ml-auto px-3 sm:px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-600 text-white rounded-lg sm:rounded-xl text-sm sm:text-base font-semibold hover:from-purple-600 hover:to-pink-700 transition flex items-center gap-2"
                   >
-                    <Plus className="w-5 h-5" />
-                    Add New Admin
+                    <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
+                    <span className="hidden sm:inline">Add New Admin</span>
+                    <span className="sm:hidden">Add Admin</span>
                   </button>
                 </div>
 
                 <div className="grid gap-4">
                   {adminList.map(admin => (
-                    <div key={admin.id} className="bg-[#1a1f37]/50 border border-white/10 rounded-xl p-6 hover:border-purple-500/30 transition">
-                      <div className="flex justify-between items-start">
+                    <div key={admin.id} className="bg-[#1a1f37]/50 border border-white/10 rounded-xl p-4 sm:p-6 hover:border-purple-500/30 transition">
+                      <div className="flex flex-col sm:flex-row justify-between items-start gap-3 sm:gap-0">
                         <div>
                           <h3 className="text-xl font-bold text-white mb-2">{admin.name}</h3>
                           <p className="text-gray-400 text-sm mb-1">
@@ -873,19 +997,19 @@ const SuperAdminPortal = () => {
                             Admin
                           </span>
                         </div>
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 w-full sm:w-auto">
                           <button
                             type="button"
                             onClick={() => openEditModal(admin)}
-                            className="px-4 py-2 bg-blue-500/20 border border-blue-500/30 text-blue-300 rounded-lg hover:bg-blue-500/30 transition flex items-center gap-2"
+                            className="flex-1 sm:flex-none px-3 sm:px-4 py-2 bg-blue-500/20 border border-blue-500/30 text-blue-300 rounded-lg hover:bg-blue-500/30 transition flex items-center justify-center gap-2 text-sm"
                           >
                             <FileText className="w-4 h-4" />
-                            Edit
+                            <span className="hidden sm:inline">Edit</span>
                           </button>
                           <button
                             type="button"
                             onClick={() => deleteAdmin(admin.id)}
-                            className="px-4 py-2 bg-red-500/20 border border-red-500/30 text-red-300 rounded-lg hover:bg-red-500/30 transition flex items-center gap-2"
+                            className="flex-1 sm:flex-none px-3 sm:px-4 py-2 bg-red-500/20 border border-red-500/30 text-red-300 rounded-lg hover:bg-red-500/30 transition flex items-center justify-center gap-2 text-sm"
                           >
                             <Trash2 className="w-4 h-4" />
                             Delete
@@ -901,9 +1025,9 @@ const SuperAdminPortal = () => {
             {/* Stall Configuration Tab */}
             {superAdminTab === 'stallconfig' && (
               <div>
-                <div className="bg-gradient-to-br from-green-500/10 to-blue-600/10 border border-green-500/20 rounded-2xl p-8 mb-6">
-                  <div className="flex items-start gap-4 mb-6">
-                    <div className="bg-gradient-to-br from-green-500 to-blue-600 p-3 rounded-xl">
+                <div className="bg-gradient-to-br from-green-500/10 to-blue-600/10 border border-green-500/20 rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 mb-6">
+                  <div className="flex items-start gap-3 sm:gap-4 mb-4 sm:mb-6">
+                    <div className="bg-gradient-to-br from-green-500 to-blue-600 p-2 sm:p-3 rounded-xl">
                       <Building className="w-6 h-6 text-white" />
                     </div>
                     <div className="flex-1">
@@ -912,8 +1036,8 @@ const SuperAdminPortal = () => {
                     </div>
                   </div>
                   
-                  <div className="grid md:grid-cols-3 gap-6 mb-6">
-                    <div className="bg-[#1a1f37]/50 rounded-xl p-5 border border-white/10">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-6">
+                    <div className="bg-[#1a1f37]/50 rounded-xl p-4 sm:p-5 border border-white/10">
                       <label className="block text-sm font-semibold text-gray-300 mb-3">Small Stalls</label>
                       <input
                         type="number"
@@ -925,7 +1049,7 @@ const SuperAdminPortal = () => {
                       <p className="text-xs text-gray-400 mt-2">Compact spaces</p>
                     </div>
                     
-                    <div className="bg-[#1a1f37]/50 rounded-xl p-5 border border-white/10">
+                    <div className="bg-[#1a1f37]/50 rounded-xl p-4 sm:p-5 border border-white/10">
                       <label className="block text-sm font-semibold text-gray-300 mb-3">Medium Stalls</label>
                       <input
                         type="number"
@@ -937,7 +1061,7 @@ const SuperAdminPortal = () => {
                       <p className="text-xs text-gray-400 mt-2">Standard size</p>
                     </div>
                     
-                    <div className="bg-[#1a1f37]/50 rounded-xl p-5 border border-white/10">
+                    <div className="bg-[#1a1f37]/50 rounded-xl p-4 sm:p-5 border border-white/10">
                       <label className="block text-sm font-semibold text-gray-300 mb-3">Large Stalls</label>
                       <input
                         type="number"
@@ -1019,7 +1143,7 @@ const SuperAdminPortal = () => {
                   
                   <div className="space-y-4">
                     <label className="block">
-                      <div className="border-2 border-dashed border-purple-500/30 rounded-xl p-8 text-center hover:border-purple-500/50 transition cursor-pointer bg-[#1a1f37]/30">
+                      <div className="border-2 border-dashed border-purple-500/30 rounded-xl p-4 sm:p-6 md:p-8 text-center hover:border-purple-500/50 transition cursor-pointer bg-[#1a1f37]/30">
                         <input
                           type="file"
                           accept="image/*"
@@ -1028,9 +1152,9 @@ const SuperAdminPortal = () => {
                           id="super-map-upload"
                         />
                         <label htmlFor="super-map-upload" className="cursor-pointer">
-                          <div className="flex flex-col items-center gap-3">
-                            <div className="bg-gradient-to-br from-purple-500 to-indigo-600 p-4 rounded-full">
-                              <Building className="w-8 h-8 text-white" />
+                          <div className="flex flex-col items-center gap-2 sm:gap-3">
+                            <div className="bg-gradient-to-br from-purple-500 to-indigo-600 p-3 sm:p-4 rounded-full">
+                              <Building className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
                             </div>
                             <div>
                               <p className="text-white font-semibold mb-1">Click to upload map image</p>
@@ -1048,7 +1172,7 @@ const SuperAdminPortal = () => {
                             <CheckCircle className="w-5 h-5 text-green-400" />
                             <span className="text-white font-semibold">Map Uploaded</span>
                           </div>
-                          <div className="flex items-center gap-2">
+                          <div className="flex flex-col sm:flex-row items-center gap-2">
                             <button
                               type="button"
                               onClick={() => {
@@ -1058,14 +1182,15 @@ const SuperAdminPortal = () => {
                                 }
                                 setIsPositioningMode(!isPositioningMode);
                               }}
-                              className={`px-4 py-2 rounded-lg font-semibold text-sm transition flex items-center gap-2 ${
+                              className={`w-full sm:w-auto px-3 sm:px-4 py-2 rounded-lg font-semibold text-xs sm:text-sm transition flex items-center justify-center gap-2 ${
                                 isPositioningMode
                                   ? 'bg-gradient-to-r from-orange-500 to-red-600 text-white'
                                   : 'bg-gradient-to-r from-blue-500 to-cyan-600 text-white'
                               }`}
                             >
                               <MapPin className="w-4 h-4" />
-                              {isPositioningMode ? 'Exit Positioning' : 'Position Stalls'}
+                              <span className="hidden sm:inline">{isPositioningMode ? 'Exit Positioning' : 'Position Stalls'}</span>
+                              <span className="sm:hidden">{isPositioningMode ? 'Exit' : 'Position'}</span>
                             </button>
                             <button
                               type="button"
@@ -1089,7 +1214,7 @@ const SuperAdminPortal = () => {
                         {isPositioningMode && (
                           <div className="bg-orange-500/20 border border-orange-500/40 rounded-lg p-3 mb-4">
                             <p className="text-sm text-white font-semibold mb-2">Positioning Mode Active</p>
-                            <div className="mt-3 grid grid-cols-10 gap-2">
+                            <div className="mt-3 grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-2">
                               {stalls.filter(s => !s.isEmpty).map(stall => (
                                 <button
                                   type="button"
@@ -1205,11 +1330,11 @@ const SuperAdminPortal = () => {
         {/* Modals */}
         {showAddAdminModal && (
             <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-              <div className="bg-gradient-to-br from-[#2a2f4a] to-[#1e2337] rounded-2xl border border-white/10 p-8 max-w-md w-full">
-                <h3 className="text-2xl font-bold text-white mb-6">Add New Admin</h3>
-                <div className="space-y-4">
+              <div className="bg-gradient-to-br from-[#2a2f4a] to-[#1e2337] rounded-xl sm:rounded-2xl border border-white/10 p-4 sm:p-6 md:p-8 max-w-md w-full">
+                <h3 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6">Add New Admin</h3>
+                <div className="space-y-3 sm:space-y-4">
                   <div>
-                    <label className="block text-sm font-semibold text-gray-300 mb-2">Name</label>
+                    <label className="block text-xs sm:text-sm font-semibold text-gray-300 mb-2">Name</label>
                     <input
                       type="text"
                       value={newAdminData.name}
@@ -1236,12 +1361,11 @@ const SuperAdminPortal = () => {
                     />
                   </div>
                 </div>
-                <div className="flex gap-3 mt-6">
+                <div className="flex flex-col sm:flex-row gap-3 mt-4 sm:mt-6">
                   <button
                     type="button"
                     onClick={handleAddAdmin}
-                    className="flex-1 py-3 bg-gradient-to-r from-purple-500 to-pink-600 text-white rounded-xl font-bold hover:from-purple-600 hover:to-pink-700 transition"
-                  >
+                    className="flex-1 py-2 sm:py-3 bg-gradient-to-r from-purple-500 to-pink-600 text-white rounded-lg sm:rounded-xl text-sm sm:text-base font-bold hover:from-purple-600 hover:to-pink-700 transition">
                     Add Admin
                   </button>
                   <button
@@ -1250,8 +1374,7 @@ const SuperAdminPortal = () => {
                       setShowAddAdminModal(false);
                       setNewAdminData({ name: '', email: '', password: '' });
                     }}
-                    className="flex-1 py-3 bg-gray-600 text-white rounded-xl font-bold hover:bg-gray-700 transition"
-                  >
+                    className="flex-1 py-2 sm:py-3 bg-gray-600 text-white rounded-lg sm:rounded-xl text-sm sm:text-base font-bold hover:bg-gray-700 transition">
                     Cancel
                   </button>
                 </div>
@@ -1262,11 +1385,11 @@ const SuperAdminPortal = () => {
           {/* Edit Admin Modal */}
           {showEditAdminModal && editingAdmin && (
             <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-              <div className="bg-gradient-to-br from-[#2a2f4a] to-[#1e2337] rounded-2xl border border-white/10 p-8 max-w-md w-full">
-                <h3 className="text-2xl font-bold text-white mb-6">Edit Admin</h3>
-                <div className="space-y-4">
+              <div className="bg-gradient-to-br from-[#2a2f4a] to-[#1e2337] rounded-xl sm:rounded-2xl border border-white/10 p-4 sm:p-6 md:p-8 max-w-md w-full">
+                <h3 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6">Edit Admin</h3>
+                <div className="space-y-3 sm:space-y-4">
                   <div>
-                    <label className="block text-sm font-semibold text-gray-300 mb-2">Name</label>
+                    <label className="block text-xs sm:text-sm font-semibold text-gray-300 mb-2">Name</label>
                     <input
                       type="text"
                       value={newAdminData.name}
@@ -1294,11 +1417,11 @@ const SuperAdminPortal = () => {
                     />
                   </div>
                 </div>
-                <div className="flex gap-3 mt-6">
+                <div className="flex flex-col sm:flex-row gap-3 mt-4 sm:mt-6">
                   <button
                     type="button"
                     onClick={handleEditAdmin}
-                    className="flex-1 py-3 bg-gradient-to-r from-purple-500 to-pink-600 text-white rounded-xl font-bold hover:from-purple-600 hover:to-pink-700 transition"
+                    className="flex-1 py-2 sm:py-3 bg-gradient-to-r from-purple-500 to-pink-600 text-white rounded-lg sm:rounded-xl text-sm sm:text-base font-bold hover:from-purple-600 hover:to-pink-700 transition"
                   >
                     Save Changes
                   </button>
@@ -1309,7 +1432,7 @@ const SuperAdminPortal = () => {
                       setEditingAdmin(null);
                       setNewAdminData({ name: '', email: '', password: '' });
                     }}
-                    className="flex-1 py-3 bg-gray-600 text-white rounded-xl font-bold hover:bg-gray-700 transition"
+                    className="flex-1 py-2 sm:py-3 bg-gray-600 text-white rounded-lg sm:rounded-xl text-sm sm:text-base font-bold hover:bg-gray-700 transition"
                   >
                     Cancel
                   </button>
